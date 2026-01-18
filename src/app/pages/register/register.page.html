@@ -1,0 +1,86 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/login" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Inscription</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="auth-header ion-text-center">
+    <ion-icon name="person-add-outline"></ion-icon>
+    <h1>Bienvenue !</h1>
+    <p>Créez votre compte RouteSafe</p>
+  </div>
+
+  <div class="auth-card">
+    <ion-card-content>
+      <h2>Créez votre compte</h2>
+
+      <form (ngSubmit)="onRegister()">
+        <ion-item lines="none">
+          <ion-icon name="mail-outline" slot="start"></ion-icon>
+          <ion-label position="stacked">Email</ion-label>
+          <ion-input
+            [(ngModel)]="email"
+            name="email"
+            type="email"
+            placeholder="exemple@mail.com"
+            required>
+          </ion-input>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+          <ion-label position="stacked">Mot de passe</ion-label>
+          <ion-input
+            [(ngModel)]="password"
+            name="password"
+            type="password"
+            placeholder="Minimum 6 caractères"
+            required>
+          </ion-input>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-icon name="shield-checkmark-outline" slot="start"></ion-icon>
+          <ion-label position="stacked">Confirmer le mot de passe</ion-label>
+          <ion-input
+            [(ngModel)]="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            required>
+          </ion-input>
+        </ion-item>
+
+        <ion-item lines="none" class="ion-no-padding">
+          <ion-checkbox slot="start" [(ngModel)]="termsAccepted" name="terms"></ion-checkbox>
+          <ion-label class="ion-text-wrap ion-padding-start">
+            J'accepte les <a href="#">conditions d'utilisation</a>
+          </ion-label>
+        </ion-item>
+
+        <ion-button
+          expand="block"
+          type="submit"
+          [disabled]="!email || !password || !confirmPassword || !termsAccepted">
+          <ion-icon name="person-add-outline" slot="start"></ion-icon>
+          S'inscrire
+        </ion-button>
+
+        <ion-text color="danger" *ngIf="errorMessage" class="error-message">
+          <ion-icon name="warning-outline"></ion-icon>
+          {{ errorMessage }}
+        </ion-text>
+      </form>
+
+      <div class="bottom-link">
+        <ion-button fill="clear" (click)="goToLogin()">
+          Vous avez déjà un compte ? Se connecter
+          <ion-icon name="log-in-outline" slot="end"></ion-icon>
+        </ion-button>
+      </div>
+    </ion-card-content>
+  </div>
+</ion-content>

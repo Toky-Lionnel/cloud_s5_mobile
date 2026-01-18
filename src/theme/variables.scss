@@ -1,2 +1,145 @@
 // For information on how to create your own theme, please refer to:
 // https://ionicframework.com/docs/theming/
+/* src/theme/variables.scss ou un fichier CSS/SCSS global */
+
+:root {
+  --ion-color-primary: #1976D2; // Un bleu plus vif
+  --ion-color-primary-rgb: 25,118,210;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255,255,255;
+  --ion-color-primary-shade: #1769bd;
+  --ion-color-primary-tint: #3185d7;
+
+  --ion-color-light: #f4f5f8;
+  --ion-color-light-rgb: 244,245,248;
+  --ion-color-light-contrast: #000000;
+  --ion-color-light-contrast-rgb: 0,0,0;
+  --ion-color-light-shade: #d7d8da;
+  --ion-color-light-tint: #f5f6f9;
+
+  --ion-font-family: 'Roboto', sans-serif; // Ou une autre police de votre choix
+}
+
+body {
+  font-family: var(--ion-font-family);
+}
+
+.ion-page {
+  background: var(--ion-color-light); // Fond gris clair pour tout le corps
+}
+
+// Styles généraux pour les conteneurs de formulaire
+.auth-header {
+  background: var(--ion-color-primary);
+  color: white;
+  padding: 60px 20px 40px 20px; // Plus de padding en haut
+  border-bottom-left-radius: 60px; // Arrondis plus prononcés
+  border-bottom-right-radius: 60px;
+  position: relative;
+  z-index: 10; // Pour s'assurer que la carte est par-dessus
+
+  ion-icon {
+    font-size: 80px; // Icône plus grande
+    margin-bottom: 10px;
+    color: white; // S'assurer que l'icône est blanche
+  }
+
+  h1 {
+    font-size: 2.2em;
+    margin: 5px 0 0 0;
+    font-weight: 700;
+  }
+
+  p {
+    font-size: 1em;
+    opacity: 0.9;
+    margin: 0;
+  }
+}
+
+.auth-card {
+  margin: -30px 20px 20px 20px; // Fait remonter la carte sur le header
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); // Ombre plus prononcée
+  background: white;
+  position: relative;
+  z-index: 20;
+
+  ion-card-content {
+    padding: 25px;
+  }
+
+  h2 {
+    font-size: 1.6em;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--ion-color-dark);
+  }
+
+  ion-item {
+    --background: var(--ion-color-light); // Fond des items plus clair
+    --border-radius: 10px;
+    --border-width: 0px; // Pas de bordure par défaut
+    margin-bottom: 15px; // Plus d'espace entre les items
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.08); // Petite ombre interne
+    --padding-start: 15px; // Plus de padding à gauche
+    --highlight-background: transparent; // Enlever le surlignage par défaut
+
+    ion-label {
+      font-size: 0.9em;
+      color: var(--ion-color-medium);
+      padding-bottom: 5px;
+    }
+
+    ion-input {
+      --padding-top: 10px;
+      --padding-bottom: 10px;
+      color: var(--ion-color-dark);
+    }
+
+    ion-icon[slot="start"] {
+      color: var(--ion-color-primary);
+      margin-right: 10px;
+    }
+  }
+
+  ion-button {
+    --border-radius: 10px;
+    height: 50px;
+    font-weight: 600;
+    font-size: 1.1em;
+    margin-top: 25px; // Plus d'espace au-dessus du bouton principal
+    box-shadow: 0 4px 15px rgba(var(--ion-color-primary-rgb), 0.3); // Ombre pour le bouton
+  }
+
+  .bottom-link {
+    margin-top: 25px;
+    text-align: center;
+
+    ion-button {
+      font-size: 0.9em;
+      --padding-start: 0;
+      --padding-end: 0;
+      height: auto; // Réduit la hauteur des boutons secondaires
+      margin-top: 0;
+      box-shadow: none; // Pas d'ombre pour les boutons secondaires
+      color: var(--ion-color-medium);
+    }
+  }
+
+  .error-message {
+    color: var(--ion-color-danger);
+    font-size: 0.9em;
+    margin-top: 15px;
+    padding: 10px;
+    background: var(--ion-color-danger-tint);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    ion-icon {
+      margin-right: 8px;
+    }
+  }
+}

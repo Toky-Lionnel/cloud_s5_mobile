@@ -1,0 +1,51 @@
+#map {
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+}
+
+.search-container {
+  position: absolute;
+  top: 20px;
+  left: 10px;
+  right: 10px;
+  z-index: 1000;
+
+  ion-searchbar {
+    --box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    --border-radius: 12px;
+  }
+}
+
+// Positionnement spécifique des boutons
+.fab-locate {
+  margin-bottom: 90px; // Au-dessus du bouton ajouter
+}
+
+.fab-add {
+  margin-bottom: 20px;
+
+  ion-fab-button {
+    --border-radius: 30px;
+    width: 160px; // Version large pour le bouton principal
+  }
+}
+
+// Style pour le point bleu de localisation
+::ng-deep .user-location-icon {
+  .blue-dot {
+    width: 15px;
+    height: 15px;
+    background: #3880ff;
+    border: 3px solid white;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    animation: pulse 2s infinite;
+  }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(56, 128, 255, 0.7); }
+  70% { transform: scale(1.2); box-shadow: 0 0 0 10px rgba(56, 128, 255, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(56, 128, 255, 0); }
+}

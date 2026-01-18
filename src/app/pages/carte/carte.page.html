@@ -1,0 +1,20 @@
+<ion-content [fullscreen]="true">
+  <div class="search-container">
+    <ion-searchbar placeholder="Rechercher un lieu..." mode="android"></ion-searchbar>
+  </div>
+
+  <div id="map"></div>
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end" class="fab-locate">
+    <ion-fab-button color="light" (click)="locateUser()">
+      <ion-icon name="locate"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="center" class="fab-add">
+    <ion-fab-button color="primary" (click)="addReport()">
+      <ion-icon name="add"></ion-icon>
+      <ion-label class="ion-hide-sm-down">Signaler</ion-label>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>
