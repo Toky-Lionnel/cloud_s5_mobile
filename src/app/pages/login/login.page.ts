@@ -5,27 +5,27 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from 'src/app/services/auth.service';
 import { addIcons } from 'ionicons';
 import { mailOutline, lockClosedOutline, logInOutline, personAddOutline, alertCircleOutline } from 'ionicons/icons';
-import { 
-  IonContent, IonInput, IonButton, IonItem, IonLabel, IonIcon, 
-  IonCard, IonCardContent, LoadingController, ToastController 
+import {
+  IonContent, IonInput, IonButton, IonItem, IonLabel, IonIcon,
+  IonCardContent, LoadingController, ToastController
 } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonContent, IonInput, IonButton, IonItem, IonLabel, IonIcon, IonCard, IonCardContent],
+  imports: [CommonModule, FormsModule, IonContent, IonInput, IonButton, IonItem, IonLabel, IonIcon, IonCardContent],
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss']
 })
 export class LoginPage {
-  email = '';
-  password = '';
+  email = 'mobiles5@example.com';
+  password = '123456';
 
   constructor(
-    private router: Router, 
+    private router: Router,
     private authService: AuthService,
-    private loadingCtrl: LoadingController, // Injecter le controller
-    private toastCtrl: ToastController    // Injecter le controller
+    private loadingCtrl: LoadingController,
+    private toastCtrl: ToastController
   ) {
     addIcons({ mailOutline, lockClosedOutline, logInOutline, personAddOutline, alertCircleOutline });
   }
@@ -36,20 +36,16 @@ export class LoginPage {
       message: 'Connexion en cours...',
       spinner: 'crescent'
     });
-    
+
     await loading.present();
 
     try {
       await this.authService.login(this.email, this.password);
       await loading.dismiss();
-      
-      // Message de succès
-      this.presentToast('Connexion réussie !', 'success', 'checkmark-circle-outline');
       this.router.navigateByUrl('/map', { replaceUrl: true });
 
     } catch (err: any) {
       await loading.dismiss();
-      // Message d'erreur
       this.presentToast('Erreur : Email ou mot de passe incorrect.', 'danger', 'alert-circle-outline');
     }
   }

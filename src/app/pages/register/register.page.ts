@@ -5,14 +5,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
 import { mailOutline, lockClosedOutline, shieldCheckmarkOutline, personAddOutline } from 'ionicons/icons';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonInput, IonButton, IonItem, IonLabel, IonIcon, IonCard, IonCardContent, IonButtons, IonBackButton, IonCheckbox, LoadingController, ToastController, IonText } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonInput, IonButton, IonItem, IonLabel, IonIcon, IonCard, IonCardContent, IonButtons, IonBackButton, LoadingController, ToastController } from '@ionic/angular/standalone';
 
 @Component({
   standalone: true,
   selector: 'app-register',
   templateUrl: './register.page.html',
   styleUrls: ['./register.page.scss'],
-  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonInput, IonButton, IonItem, IonLabel, IonIcon, IonCard, IonCardContent, IonButtons, IonBackButton, IonCheckbox, IonText],
+  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonInput, IonButton, IonItem, IonLabel, IonIcon, IonCardContent, IonButtons, IonBackButton],
 })
 export class RegisterPage {
   email = '';
