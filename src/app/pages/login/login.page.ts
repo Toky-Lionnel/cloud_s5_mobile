@@ -3,54 +3,68 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from 'src/app/services/auth.service';
-import { IonContent,IonInput,IonButton,IonItem,IonLabel,IonIcon,IonCard,IonCardContent,IonText} from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons'; // 1. Importer addIcons
-import { mailOutline, lockClosedOutline, logInOutline, personAddOutline, alertCircleOutline, warningOutline } from 'ionicons/icons'; // 2. Importer les icônes
+import { addIcons } from 'ionicons';
+import { mailOutline, lockClosedOutline, logInOutline, personAddOutline, alertCircleOutline } from 'ionicons/icons';
+import { 
+  IonContent, IonInput, IonButton, IonItem, IonLabel, IonIcon, 
+  IonCard, IonCardContent, LoadingController, ToastController 
+} from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonContent,
-    IonInput,
-    IonButton,
-    IonItem,
-    IonLabel,
-    IonIcon,
-    IonCard,
-    IonCardContent,
-    IonText // Import IonText
-  ],
+  imports: [CommonModule, FormsModule, IonContent, IonInput, IonButton, IonItem, IonLabel, IonIcon, IonCard, IonCardContent],
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss']
 })
 export class LoginPage {
-  email: string = ''; // Laissez vide pour une meilleure UX
-  password: string = ''; // Laissez vide
-  errorMessage: string = ''; // Pour afficher les erreurs
+  email = '';
+  password = '';
 
-  constructor(private router: Router, private authService: AuthService) {
-    addIcons({
-      mailOutline,
-      lockClosedOutline,
-      logInOutline,
-      personAddOutline,
-      alertCircleOutline,
-      warningOutline
-    });
+  constructor(
+    private router: Router, 
+    private authService: AuthService,
+    private loadingCtrl: LoadingController, // Injecter le controller
+    private toastCtrl: ToastController    // Injecter le controller
+  ) {
+    addIcons({ mailOutline, lockClosedOutline, logInOutline, personAddOutline, alertCircleOutline });
   }
 
   async login() {
-    this.errorMessage = ''; // Réinitialise l'erreur à chaque tentative
+    // 1. Créer le loader
+    const loading = await this.loadingCtrl.create({
+      message: 'Connexion en cours...',
+      spinner: 'crescent'
+    });
+    
+    await loading.present();
+
     try {
       await this.authService.login(this.email, this.password);
+      await loading.dismiss();
+      
+      // Message de succès
+      this.presentToast('Connexion réussie !', 'success', 'checkmark-circle-outline');
       this.router.navigateByUrl('/map', { replaceUrl: true });
+
     } catch (err: any) {
-      console.error('Erreur de connexion:', err);
-      this.errorMessage = 'Identifiants incorrects ou problème de connexion.'; // Message générique
+      await loading.dismiss();
+      // Message d'erreur
+      this.presentToast('Erreur : Email ou mot de passe incorrect.', 'danger', 'alert-circle-outline');
     }
+  }
+
+  // Fonction utilitaire pour afficher les messages
+  async presentToast(message: string, color: 'success' | 'danger', icon: string) {
+    const toast = await this.toastCtrl.create({
+      message: message,
+      duration: 3000,
+      color: color,
+      position: 'top',
+      icon: icon,
+      cssClass: 'custom-toast'
+    });
+    await toast.present();
   }
 
   goToRegister() {

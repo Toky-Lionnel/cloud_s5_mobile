@@ -3,89 +3,64 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {
-  IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
-  IonInput,
-  IonButton,
-  IonItem,
-  IonLabel,
-  IonIcon,
-  IonCard,
-  IonCardContent,
-  IonButtons,
-  IonBackButton,
-  IonText, // Add IonText
-  IonCheckbox // Add IonCheckbox
-} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { mailOutline, lockClosedOutline, shieldCheckmarkOutline, personAddOutline, logInOutline, warningOutline } from 'ionicons/icons';
+import { mailOutline, lockClosedOutline, shieldCheckmarkOutline, personAddOutline } from 'ionicons/icons';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonInput, IonButton, IonItem, IonLabel, IonIcon, IonCard, IonCardContent, IonButtons, IonBackButton, IonCheckbox, LoadingController, ToastController, IonText } from '@ionic/angular/standalone';
 
 @Component({
   standalone: true,
   selector: 'app-register',
   templateUrl: './register.page.html',
   styleUrls: ['./register.page.scss'],
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonContent,
-    IonHeader,
-    IonTitle,
-    IonToolbar,
-    IonInput,
-    IonButton,
-    IonItem,
-    IonLabel,
-    IonIcon,
-    IonCard,
-    IonCardContent,
-    IonButtons,
-    IonBackButton,
-    IonText, // Import IonText
-    IonCheckbox // Import IonCheckbox
-  ],
+  imports: [CommonModule, FormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonInput, IonButton, IonItem, IonLabel, IonIcon, IonCard, IonCardContent, IonButtons, IonBackButton, IonCheckbox, IonText],
 })
 export class RegisterPage {
   email = '';
   password = '';
   confirmPassword = '';
-  errorMessage = ''; // Pour afficher les erreurs
+  termsAccepted = false;
 
-  constructor(private authService: AuthService, private router: Router) {
-    addIcons({
-      mailOutline,
-      lockClosedOutline,
-      shieldCheckmarkOutline,
-      personAddOutline,
-      logInOutline,
-      warningOutline
-    });
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private loadingCtrl: LoadingController,
+    private toastCtrl: ToastController
+  ) {
+    addIcons({ mailOutline, lockClosedOutline, shieldCheckmarkOutline, personAddOutline });
   }
 
   async onRegister() {
-    this.errorMessage = ''; // Réinitialise l'erreur
-
-    // Validation
     if (this.password !== this.confirmPassword) {
-      this.errorMessage = 'Les mots de passe ne correspondent pas.';
+      this.presentToast('Les mots de passe ne correspondent pas.', 'danger', 'warning-outline');
       return;
     }
 
-    if (this.password.length < 6) {
-      this.errorMessage = 'Le mot de passe doit contenir au moins 6 caractères.';
-      return;
-    }
+    const loading = await this.loadingCtrl.create({
+      message: 'Création du compte...',
+    });
+    await loading.present();
 
     try {
       await this.authService.register(this.email, this.password);
-      this.router.navigateByUrl('/login', { replaceUrl: true });
+      await loading.dismiss();
+
+      this.presentToast('Compte créé avec succès ! Connectez-vous.', 'success', 'happy-outline');
+      this.router.navigateByUrl('/login');
     } catch (err: any) {
-      console.error('Erreur d\'inscription:', err);
-      this.errorMessage = err.message || 'Une erreur est survenue lors de l\'inscription.';
+      await loading.dismiss();
+      this.presentToast(err.message || "Erreur lors de l'inscription", 'danger', 'close-circle-outline');
     }
+  }
+
+  async presentToast(message: string, color: 'success' | 'danger', icon: string) {
+    const toast = await this.toastCtrl.create({
+      message: message,
+      duration: 3000,
+      color: color,
+      position: 'top',
+      icon: icon
+    });
+    await toast.present();
   }
 
   goToLogin() {
