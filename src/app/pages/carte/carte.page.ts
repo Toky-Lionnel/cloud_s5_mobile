@@ -8,13 +8,14 @@ import {
   IonFab,
   IonFabButton,
   IonIcon,
-  IonSearchbar,
-  IonLabel,
+  IonLabel,LoadingController,ToastController
 } from '@ionic/angular/standalone';
 import * as L from 'leaflet';
 import { locate, add, search, alertCircle } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { Geolocation } from '@capacitor/geolocation';
+import { GeoPoint } from 'firebase/firestore';
+import { SignalementService } from 'src/app/services/signalement.service';
 
 @Component({
   selector: 'app-map',
@@ -26,7 +27,6 @@ import { Geolocation } from '@capacitor/geolocation';
     IonFab,
     IonFabButton,
     IonIcon,
-    IonSearchbar,
     CommonModule,
     FormsModule,
     IonLabel,
@@ -38,7 +38,12 @@ export class MapPage implements OnInit, OnDestroy {
   selectedLatLng: L.LatLng | null = null;
   tempMarker: L.Marker | null = null;
 
-  constructor(private modalCtrl: ModalController) {
+  constructor(
+    private modalCtrl: ModalController,
+    private signalementService: SignalementService,
+    private loadingCtrl: LoadingController,
+    private toastCtrl: ToastController,
+  ) {
     addIcons({ locate, add, search, alertCircle });
   }
 
@@ -98,15 +103,36 @@ export class MapPage implements OnInit, OnDestroy {
     const { data, role } = await modal.onWillDismiss();
 
     if (role === 'confirm') {
-      console.log('Signalement enregistré :', data);
-
       // Ici vous pouvez transformer le marqueur temporaire en marqueur définitif
       this.saveSignalement(data);
     }
   }
 
-  saveSignalement(data: any) {
-    // Logique pour envoyer au serveur ou afficher sur la carte
+
+  async sauvegarderSignalement(data: any) {
+    const loading = await this.loadingCtrl.create({
+      message: 'Enregistrement du signalement...',
+    });
+    await loading.present();
+
+    try {
+      await this.signalementService.addSignalement({
+        localisation: new GeoPoint(data.location.lat, data.location.lng),
+        surface: data.surface,
+        createdAt: new Date()
+      });
+
+      await loading.dismiss();
+      this.presentToast('Signalement effectué avec succès !', 'success', 'happy-outline');
+    } catch (error : any) {
+      await loading.dismiss();
+      console.error("Erreur lors de l'enregistrement du signalement:", error);
+      this.presentToast(error.message || `Erreur lors de l'enregistrement du signalement: ${error}`, 'danger', 'close-circle-outline');
+    }
+  }
+
+  async saveSignalement(data: any) {
+    await this.sauvegarderSignalement(data);
     L.circle([data.location.lat, data.location.lng], {
       color: 'orange',
       fillColor: '#f03',
@@ -115,7 +141,6 @@ export class MapPage implements OnInit, OnDestroy {
     }).addTo(this.map)
       .bindPopup(`Signalement: ${data.surface}m²`);
 
-    console.log(data);
     this.selectedLatLng = null; // Reset
     if (this.tempMarker) this.map.removeLayer(this.tempMarker);
   }
@@ -143,6 +168,17 @@ export class MapPage implements OnInit, OnDestroy {
     if (this.map) {
       this.map.remove();
     }
+  }
+
+  async presentToast(message: string, color: 'success' | 'danger', icon: string) {
+    const toast = await this.toastCtrl.create({
+      message: message,
+      duration: 3000,
+      color: color,
+      position: 'top',
+      icon: icon
+    });
+    await toast.present();
   }
 
 

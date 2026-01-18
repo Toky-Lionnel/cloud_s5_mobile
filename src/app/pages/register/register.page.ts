@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { FirestoreService, UserData } from '../../services/firestore.service';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
@@ -26,7 +25,6 @@ export class RegisterPage {
     private router: Router,
     private loadingCtrl: LoadingController,
     private toastCtrl: ToastController,
-    private firestoreService: FirestoreService,
   ) {
     addIcons({ mailOutline, lockClosedOutline, shieldCheckmarkOutline, personAddOutline });
   }
@@ -43,15 +41,7 @@ export class RegisterPage {
     await loading.present();
 
     try {
-
-      const userData: UserData = {
-        email: this.email,
-        password: this.password,
-        createdAt: new Date()
-      };
-
-      await this.authService.register(this.email, this.password);
-      await this.firestoreService.addUser(userData);
+      await this.authService.inscription({email: this.email, password: this.password});
       await loading.dismiss();
 
       this.presentToast('Compte créé avec succès ! Connectez-vous.', 'success', 'happy-outline');
