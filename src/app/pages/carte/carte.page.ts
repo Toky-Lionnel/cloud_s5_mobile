@@ -3,19 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ModalController } from '@ionic/angular/standalone';
 import { ReportModalComponent } from 'src/app/components/report-modal.component';
-import {
-  IonContent,
-  IonFab,
-  IonFabButton,
-  IonIcon,
-  IonLabel,LoadingController,ToastController
-} from '@ionic/angular/standalone';
+import {IonContent,IonFab,IonFabButton,IonIcon,
+  IonLabel,LoadingController,ToastController } from '@ionic/angular/standalone';
 import * as L from 'leaflet';
 import { locate, add, search, alertCircle } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { Geolocation } from '@capacitor/geolocation';
 import { GeoPoint } from 'firebase/firestore';
 import { SignalementService } from 'src/app/services/signalement.service';
+import { Observable, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-map',
@@ -23,20 +19,16 @@ import { SignalementService } from 'src/app/services/signalement.service';
   styleUrls: ['./carte.page.scss'],
   standalone: true,
   imports: [
-    IonContent,
-    IonFab,
-    IonFabButton,
-    IonIcon,
-    CommonModule,
-    FormsModule,
-    IonLabel,
-  ],
+    IonContent,IonFab,IonFabButton,
+    IonIcon,CommonModule,FormsModule,IonLabel,],
 })
+
 export class MapPage implements OnInit, OnDestroy {
   map!: L.Map;
   userMarker?: L.Marker;
   selectedLatLng: L.LatLng | null = null;
   tempMarker: L.Marker | null = null;
+  private signalementsSub?: Subscription;
 
   constructor(
     private modalCtrl: ModalController,
@@ -48,7 +40,11 @@ export class MapPage implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    setTimeout(() => this.initMap(), 500);
+    setTimeout(
+      () => {
+        this.initMap();
+        this.loadSignalements();
+      }, 500);
   }
 
   initMap() {
@@ -103,9 +99,32 @@ export class MapPage implements OnInit, OnDestroy {
     const { data, role } = await modal.onWillDismiss();
 
     if (role === 'confirm') {
-      // Ici vous pouvez transformer le marqueur temporaire en marqueur définitif
       this.saveSignalement(data);
     }
+  }
+
+  loadSignalements() {
+    const data$ = this.signalementService.getSignalements() as Observable<any[]>;
+
+    this.signalementsSub = data$.subscribe(signalements => {
+      // Optionnel : Nettoyer les anciens cercles si nécessaire avant de redessiner
+      // (sinon ils vont se superposer à chaque mise à jour)
+
+      signalements.forEach(sig => {
+        if (sig.localisation) {
+          const lat = sig.localisation.latitude;
+          const lng = sig.localisation.longitude;
+
+          L.circle([lat, lng], {
+            color: 'orange',
+            fillColor: '#f03',
+            fillOpacity: 0.4,
+            radius: Math.sqrt(sig.surface || 10) * 5
+          }).addTo(this.map)
+            .bindPopup(`<b>Signalement</b><br>Surface: ${sig.surface}m²`);
+        }
+      });
+    });
   }
 
 
@@ -164,7 +183,12 @@ export class MapPage implements OnInit, OnDestroy {
   }
 
 
+
+  // Très important : se désabonner pour éviter les fuites de mémoire
   ngOnDestroy() {
+    if (this.signalementsSub) {
+      this.signalementsSub.unsubscribe();
+    }
     if (this.map) {
       this.map.remove();
     }
