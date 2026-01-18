@@ -20,6 +20,8 @@ import {
   IonText, // Add IonText
   IonCheckbox // Add IonCheckbox
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { mailOutline, lockClosedOutline, shieldCheckmarkOutline, personAddOutline, logInOutline, warningOutline } from 'ionicons/icons';
 
 @Component({
   standalone: true,
@@ -50,10 +52,18 @@ export class RegisterPage {
   email = '';
   password = '';
   confirmPassword = '';
-  termsAccepted = false; // Nouvelle propriété pour la checkbox
   errorMessage = ''; // Pour afficher les erreurs
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) {
+    addIcons({
+      mailOutline,
+      lockClosedOutline,
+      shieldCheckmarkOutline,
+      personAddOutline,
+      logInOutline,
+      warningOutline
+    });
+  }
 
   async onRegister() {
     this.errorMessage = ''; // Réinitialise l'erreur
@@ -69,14 +79,8 @@ export class RegisterPage {
       return;
     }
 
-    if (!this.termsAccepted) {
-      this.errorMessage = 'Vous devez accepter les conditions d\'utilisation.';
-      return;
-    }
-
     try {
       await this.authService.register(this.email, this.password);
-      // Redirection vers la page de connexion avec un message de succès (optionnel)
       this.router.navigateByUrl('/login', { replaceUrl: true });
     } catch (err: any) {
       console.error('Erreur d\'inscription:', err);

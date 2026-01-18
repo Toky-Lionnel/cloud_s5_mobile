@@ -54,17 +54,10 @@
           </ion-input>
         </ion-item>
 
-        <ion-item lines="none" class="ion-no-padding">
-          <ion-checkbox slot="start" [(ngModel)]="termsAccepted" name="terms"></ion-checkbox>
-          <ion-label class="ion-text-wrap ion-padding-start">
-            J'accepte les <a href="#">conditions d'utilisation</a>
-          </ion-label>
-        </ion-item>
-
         <ion-button
           expand="block"
           type="submit"
-          [disabled]="!email || !password || !confirmPassword || !termsAccepted">
+          [disabled]="!email || !password || !confirmPassword">
           <ion-icon name="person-add-outline" slot="start"></ion-icon>
           S'inscrire
         </ion-button>

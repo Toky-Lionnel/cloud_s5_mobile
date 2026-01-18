@@ -3,17 +3,9 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from 'src/app/services/auth.service';
-import {
-  IonContent,
-  IonInput,
-  IonButton,
-  IonItem,
-  IonLabel,
-  IonIcon,
-  IonCard,
-  IonCardContent,
-  IonText // Add IonText for error messages
-} from '@ionic/angular/standalone';
+import { IonContent,IonInput,IonButton,IonItem,IonLabel,IonIcon,IonCard,IonCardContent,IonText} from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons'; // 1. Importer addIcons
+import { mailOutline, lockClosedOutline, logInOutline, personAddOutline, alertCircleOutline, warningOutline } from 'ionicons/icons'; // 2. Importer les icônes
 
 @Component({
   selector: 'app-login',
@@ -39,7 +31,16 @@ export class LoginPage {
   password: string = ''; // Laissez vide
   errorMessage: string = ''; // Pour afficher les erreurs
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(private router: Router, private authService: AuthService) {
+    addIcons({
+      mailOutline,
+      lockClosedOutline,
+      logInOutline,
+      personAddOutline,
+      alertCircleOutline,
+      warningOutline
+    });
+  }
 
   async login() {
     this.errorMessage = ''; // Réinitialise l'erreur à chaque tentative
