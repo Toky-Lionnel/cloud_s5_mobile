@@ -136,7 +136,8 @@
   },
   "schematics": {
     "@ionic/angular-toolkit:component": {
-      "styleext": "scss"
+      "styleext": "scss",
+      "standalone": true
     },
     "@ionic/angular-toolkit:page": {
       "styleext": "scss"

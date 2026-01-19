@@ -1,0 +1,25 @@
+.menu-header {
+  padding: 30px 20px;
+  background: var(--ion-color-primary);
+  color: white;
+  text-align: center;
+  ion-avatar {
+    margin: 0 auto 10px;
+    width: 64px;
+    height: 64px;
+    border: 2px solid white;
+  }
+  h3 {
+    margin: 0;
+    font-weight: 600;
+  }
+  p {
+    margin: 0;
+    font-size: 0.8em;
+    opacity: 0.8;
+  }
+}
+ion-item {
+  margin: 5px 10px;
+  --border-radius: 8px;
+}

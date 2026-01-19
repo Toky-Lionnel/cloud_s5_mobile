@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ModalController, IonHeader, IonToolbar } from '@ionic/angular/standalone';
-import { ReportModalComponent } from 'src/app/components/report-modal.component';
+import { ReportModalComponent } from 'src/app/components/modal/report/report.component';
 import {IonContent,IonFab,IonFabButton,IonIcon,
   IonLabel,LoadingController,ToastController,IonMenuButton, IonButtons, } from '@ionic/angular/standalone';
 import * as L from 'leaflet';
@@ -12,7 +12,7 @@ import { Geolocation } from '@capacitor/geolocation';
 import { GeoPoint } from 'firebase/firestore';
 import { SignalementService } from 'src/app/services/signalement.service';
 import { Observable, Subscription } from 'rxjs';
-import { SidebarComponent as SidebarComponent } from "src/app/shared/sidebar.component";
+import { SidebarComponent } from "src/app/components/shared/sidebar/sidebar.component";
 
 @Component({
   selector: 'app-map',
