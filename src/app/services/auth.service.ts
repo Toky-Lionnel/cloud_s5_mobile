@@ -65,7 +65,7 @@ async changeEmail(currentEmail: string, currentPassword: string, newEmail: strin
 
     await updateEmail(user, newEmail);
 
-    const token = await user.getIdToken(true); // "true" pour forcer le refresh
+    const token = await user.getIdToken(true);
     this.sessionService.setUser(user, token);
   }
 

@@ -25,14 +25,12 @@ import { SessionService } from 'src/app/services/session.service';
 ]
 })
 export class ProfilePage implements OnInit {
-  // Données du formulaire
   userProfile = {
     pseudo: '',
     email: '',
     photoURL: 'https://ionicframework.com/docs/img/demos/avatar.svg'
   };
 
-  // Champs de sécurité
   currentPassword = '';
   newEmail = '';
   newPassword = '';
@@ -101,7 +99,6 @@ export class ProfilePage implements OnInit {
       let msg = "Erreur lors de la mise à jour.";
       if (error.code === 'auth/wrong-password') msg = "Mot de passe actuel incorrect.";
       if (error.code === 'auth/requires-recent-login') msg = "Veuillez vous reconnecter puis réessayer.";
-
       this.presentToast(msg, 'danger');
     } finally {
       loading.dismiss();
@@ -113,7 +110,7 @@ export class ProfilePage implements OnInit {
       message,
       duration: 3000,
       color,
-      position: 'bottom'
+      position: 'top'
     });
     toast.present();
   }
