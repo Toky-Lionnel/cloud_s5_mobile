@@ -29,7 +29,7 @@ export class AuthService {
         email: data.email,
         createdAt: new Date(),
         pseudo : data.pseudo,
-        password : data.password
+        password : data.password,
       });
 
       console.log("Inscription réussie !");
