@@ -7,6 +7,7 @@ export interface UserData {
   uid: string;
   email: string;
   createdAt: Date;
+  pseudo : string;
 }
 
 
@@ -25,7 +26,8 @@ export class AuthService {
       await this.addUser({
         uid: user.uid,
         email: data.email,
-        createdAt: new Date()
+        createdAt: new Date(),
+        pseudo : data.pseudo
       });
 
       console.log("Inscription réussie !");

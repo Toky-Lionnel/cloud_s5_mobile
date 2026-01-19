@@ -4,7 +4,7 @@ import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
-import { mailOutline, lockClosedOutline, shieldCheckmarkOutline, personAddOutline } from 'ionicons/icons';
+import { mailOutline, lockClosedOutline, shieldCheckmarkOutline, personAddOutline, personOutline } from 'ionicons/icons';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonInput, IonButton, IonItem, IonLabel, IonIcon, IonCard, IonCardContent, IonButtons, IonBackButton, LoadingController, ToastController } from '@ionic/angular/standalone';
 
 @Component({
@@ -18,7 +18,7 @@ export class RegisterPage {
   email = '';
   password = '';
   confirmPassword = '';
-  termsAccepted = false;
+  pseudo = '';
 
   constructor(
     private authService: AuthService,
@@ -26,7 +26,7 @@ export class RegisterPage {
     private loadingCtrl: LoadingController,
     private toastCtrl: ToastController,
   ) {
-    addIcons({ mailOutline, lockClosedOutline, shieldCheckmarkOutline, personAddOutline });
+    addIcons({ mailOutline, lockClosedOutline, shieldCheckmarkOutline, personAddOutline, personOutline });
   }
 
   async onRegister() {
@@ -41,7 +41,7 @@ export class RegisterPage {
     await loading.present();
 
     try {
-      await this.authService.inscription({email: this.email, password: this.password});
+      await this.authService.inscription({email: this.email, password: this.password, pseudo: this.pseudo});
       await loading.dismiss();
 
       this.presentToast('Compte créé avec succès ! Connectez-vous.', 'success', 'happy-outline');
