@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ModalController } from '@ionic/angular/standalone';
+import { ModalController, IonHeader, IonToolbar } from '@ionic/angular/standalone';
 import { ReportModalComponent } from 'src/app/components/report-modal.component';
 import {IonContent,IonFab,IonFabButton,IonIcon,
-  IonLabel,LoadingController,ToastController } from '@ionic/angular/standalone';
+  IonLabel,LoadingController,ToastController,IonMenuButton, IonButtons, } from '@ionic/angular/standalone';
 import * as L from 'leaflet';
 import { locate, add, search, alertCircle } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
@@ -12,6 +12,7 @@ import { Geolocation } from '@capacitor/geolocation';
 import { GeoPoint } from 'firebase/firestore';
 import { SignalementService } from 'src/app/services/signalement.service';
 import { Observable, Subscription } from 'rxjs';
+import { SidebarComponent as SidebarComponent } from "src/app/shared/sidebar.component";
 
 @Component({
   selector: 'app-map',
@@ -19,8 +20,12 @@ import { Observable, Subscription } from 'rxjs';
   styleUrls: ['./carte.page.scss'],
   standalone: true,
   imports: [
-    IonContent,IonFab,IonFabButton,
-    IonIcon,CommonModule,FormsModule,IonLabel,],
+    SidebarComponent, IonMenuButton, IonButtons,
+    IonContent, IonFab, IonFabButton,
+    IonIcon, CommonModule, FormsModule, IonLabel,
+    IonHeader,
+    IonToolbar
+],
 })
 
 export class MapPage implements OnInit, OnDestroy {
