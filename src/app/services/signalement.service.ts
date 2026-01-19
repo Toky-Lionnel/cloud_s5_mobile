@@ -6,6 +6,7 @@ export interface SignalementData {
   localisation: GeoPoint;
   surface: number;
   createdAt: Date;
+  idUser: string;
 }
 
 @Injectable({

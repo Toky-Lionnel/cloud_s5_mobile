@@ -13,6 +13,7 @@ import { GeoPoint } from 'firebase/firestore';
 import { SignalementService } from 'src/app/services/signalement.service';
 import { Observable, Subscription } from 'rxjs';
 import { SidebarComponent } from "src/app/components/shared/sidebar/sidebar.component";
+import { SessionService } from 'src/app/services/session.service';
 
 @Component({
   selector: 'app-map',
@@ -40,6 +41,7 @@ export class MapPage implements OnInit, OnDestroy {
     private signalementService: SignalementService,
     private loadingCtrl: LoadingController,
     private toastCtrl: ToastController,
+    private sessionService : SessionService,
   ) {
     addIcons({ locate, add, search, alertCircle });
   }
@@ -143,7 +145,8 @@ export class MapPage implements OnInit, OnDestroy {
       await this.signalementService.addSignalement({
         localisation: new GeoPoint(data.location.lat, data.location.lng),
         surface: data.surface,
-        createdAt: new Date()
+        createdAt: new Date(),
+        idUser : this.sessionService.getUser().uid
       });
 
       await loading.dismiss();

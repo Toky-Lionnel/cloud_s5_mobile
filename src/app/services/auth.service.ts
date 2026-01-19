@@ -1,22 +1,17 @@
 import { Injectable } from '@angular/core';
-import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from '@angular/fire/auth';
-import { Firestore, collection, addDoc, collectionData } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from '@angular/fire/auth';
+import { Firestore, doc, setDoc } from '@angular/fire/firestore';
+import { SessionService } from './session.service';
 
-export interface UserData {
-  uid: string;
-  email: string;
-  createdAt: Date;
-  pseudo : string;
-  password : string;
-}
-
-
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthService {
-  constructor(private auth: Auth,
-    private firestore: Firestore
 
+  constructor(
+    private auth: Auth,
+    private firestore: Firestore,
+    private sessionService: SessionService
   ) {}
 
   async inscription(data: any) {
@@ -28,10 +23,11 @@ export class AuthService {
         uid: user.uid,
         email: data.email,
         createdAt: new Date(),
-        pseudo : data.pseudo,
-        password : data.password,
+        pseudo: data.pseudo
       });
 
+      const token = await user.getIdToken();
+      this.sessionService.setUser(user, token);
       console.log("Inscription réussie !");
     } catch (error) {
       console.error("Erreur d'inscription :", error);
@@ -42,25 +38,20 @@ export class AuthService {
     return createUserWithEmailAndPassword(this.auth, email, password);
   }
 
-  login(email: string, password: string) {
-    return signInWithEmailAndPassword(this.auth, email, password);
+  async login(email: string, password: string) {
+    const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
+    const user = userCredential.user;
+    const token = await user.getIdToken();
+    this.sessionService.setUser(user, token);
   }
 
   logout() {
-    return signOut(this.auth);
+    this.auth.signOut();
+    this.sessionService.clear();
   }
 
-  get user() {
-    return this.auth.currentUser;
-  }
-
-  addUser(data: UserData) {
-    const usersRef = collection(this.firestore, 'users');
-    return addDoc(usersRef, data);
-  }
-
-  getUsers(): Observable<UserData[]> {
-    const usersRef = collection(this.firestore, 'users');
-    return collectionData(usersRef, { idField: 'id' }) as Observable<UserData[]>;
+  private addUser(userData: any) {
+    const userRef = doc(this.firestore, `users/${userData.uid}`);
+    return setDoc(userRef, userData);
   }
 }
