@@ -8,6 +8,7 @@ export interface UserData {
   email: string;
   createdAt: Date;
   pseudo : string;
+  password : string;
 }
 
 
@@ -27,7 +28,8 @@ export class AuthService {
         uid: user.uid,
         email: data.email,
         createdAt: new Date(),
-        pseudo : data.pseudo
+        pseudo : data.pseudo,
+        password : data.password
       });
 
       console.log("Inscription réussie !");
