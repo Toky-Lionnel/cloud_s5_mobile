@@ -15,7 +15,7 @@ import { mapOutline, listOutline, settingsOutline, logOutOutline, personCircleOu
     IonList, IonItem, IonIcon, IonLabel, IonAvatar, IonMenuToggle
   ],
   templateUrl: `./sidebar.component.html`,
-  styleUrl : 'sidebar.component.scss'
+  styleUrl : './sidebar.component.scss'
 })
 export class SidebarComponent {
   constructor(private router: Router) {
@@ -24,5 +24,9 @@ export class SidebarComponent {
 
   logout() {
     this.router.navigate(['/login']);
+  }
+
+  versProfile() {
+    this.router.navigate(['/profile']);
   }
 }

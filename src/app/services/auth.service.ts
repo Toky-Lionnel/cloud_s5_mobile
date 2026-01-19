@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from '@angular/fire/auth';
+import { Auth, createUserWithEmailAndPassword, EmailAuthProvider, reauthenticateWithCredential, signInWithEmailAndPassword, updateEmail, updatePassword } from '@angular/fire/auth';
 import { Firestore, doc, setDoc } from '@angular/fire/firestore';
 import { SessionService } from './session.service';
 
@@ -53,5 +53,31 @@ export class AuthService {
   private addUser(userData: any) {
     const userRef = doc(this.firestore, `users/${userData.uid}`);
     return setDoc(userRef, userData);
+  }
+
+
+async changeEmail(currentEmail: string, currentPassword: string, newEmail: string) {
+    const user = this.auth.currentUser;
+    if (!user) throw new Error("Aucun utilisateur connecté");
+
+    const credential = EmailAuthProvider.credential(currentEmail, currentPassword);
+    await reauthenticateWithCredential(user, credential);
+
+    await updateEmail(user, newEmail);
+
+    const token = await user.getIdToken(true); // "true" pour forcer le refresh
+    this.sessionService.setUser(user, token);
+  }
+
+  async changePassword(currentEmail: string, currentPassword: string, newPassword: string) {
+    const user = this.auth.currentUser;
+    if (!user) throw new Error("Aucun utilisateur connecté");
+
+    const credential = EmailAuthProvider.credential(currentEmail, currentPassword);
+    await reauthenticateWithCredential(user, credential);
+    await updatePassword(user, newPassword);
+
+    const token = await user.getIdToken(true);
+    this.sessionService.setUser(user, token);
   }
 }

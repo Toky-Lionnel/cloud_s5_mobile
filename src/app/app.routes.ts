@@ -3,11 +3,13 @@ import { HomePage } from './pages/home/home.page';
 import { LoginPage } from './pages/login/login.page';
 import { RegisterPage } from './pages/register/register.page';
 import { MapPage } from './pages/carte/carte.page';
+import { ProfilePage } from './pages/profile/profile.page';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: LoginPage },
   { path: 'home', component: HomePage },
   { path: 'register', component: RegisterPage },
-  { path: 'map', component: MapPage},
+  { path: 'map', component: MapPage },
+  { path: 'profile', component : ProfilePage },
 ];

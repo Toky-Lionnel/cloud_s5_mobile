@@ -1,0 +1,69 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/map"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Mon Profil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="profile-header ion-text-center">
+    <div class="avatar-container">
+      <ion-avatar>
+        <img [src]="userProfile.photoURL" />
+      </ion-avatar>
+      <ion-button fill="clear" class="edit-photo">
+        <ion-icon name="camera-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+    <h2>{{ userProfile.pseudo || 'Utilisateur' }}</h2>
+    <p>{{ userProfile.email }}</p>
+  </div>
+
+  <div class="ion-padding">
+    <ion-list lines="none">
+
+      <ion-list-header>
+        <ion-label>Informations personnelles</ion-label>
+      </ion-list-header>
+
+      <ion-item class="custom-item">
+        <ion-icon name="person-outline" slot="start" color="primary"></ion-icon>
+        <ion-label position="stacked">Nom complet / Pseudo</ion-label>
+        <ion-input type="text" [(ngModel)]="userProfile.pseudo" placeholder="Votre pseudo"></ion-input>
+      </ion-item>
+
+      <ion-item class="custom-item">
+        <ion-icon name="mail-outline" slot="start" color="primary"></ion-icon>
+        <ion-label position="stacked">Nouvel Email</ion-label>
+        <ion-input type="email" [(ngModel)]="newEmail" placeholder="nouvel@email.com"></ion-input>
+      </ion-item>
+
+      <ion-list-header class="ion-margin-top">
+        <ion-label>Sécurité & Mot de passe</ion-label>
+      </ion-list-header>
+
+      <ion-item class="custom-item password-field">
+        <ion-icon name="lock-closed-outline" slot="start" color="warning"></ion-icon>
+        <ion-label position="stacked">Mot de passe actuel (Requis)</ion-label>
+        <ion-input type="password" [(ngModel)]="currentPassword" placeholder="••••••••"></ion-input>
+        <ion-note slot="helper">Obligatoire pour valider les changements d'email ou de mot de passe.</ion-note>
+      </ion-item>
+
+      <ion-item class="custom-item">
+        <ion-icon name="key-outline" slot="start" color="primary"></ion-icon>
+        <ion-label position="stacked">Nouveau Mot de passe (Optionnel)</ion-label>
+        <ion-input type="password" [(ngModel)]="newPassword" placeholder="Laisser vide pour ne pas changer"></ion-input>
+      </ion-item>
+
+    </ion-list>
+
+    <div class="ion-margin-top">
+      <ion-button expand="block" shape="round" (click)="updateProfile()" class="save-button">
+        <ion-icon name="save-outline" slot="start"></ion-icon>
+        Enregistrer les modifications
+      </ion-button>
+    </div>
+  </div>
+</ion-content>
