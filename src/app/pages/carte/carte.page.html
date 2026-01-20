@@ -2,6 +2,13 @@
 
 <div class="ion-page" id="main-map-content">
 
+  <ion-fab slot="fixed" vertical="top" horizontal="end" class="fab-filter">
+    <ion-fab-button [color]="onlyMyReports ? 'success' : 'light'" (click)="toggleFilter()">
+      <ion-icon [name]="onlyMyReports ? 'person' : 'people-outline'"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  
   <ion-header class="ion-no-border">
     <ion-toolbar>
       <ion-buttons slot="start">

@@ -16,13 +16,23 @@
     <ion-input [value]="lat + ', ' + lng" readonly></ion-input>
   </ion-item>
 
-  <ion-item lines="full">
+  <ion-item lines="full" class="ion-margin-bottom">
     <ion-icon name="resize-outline" slot="start"></ion-icon>
     <ion-label position="stacked">Surface estimée (m²)</ion-label>
     <ion-input
       type="number"
       [(ngModel)]="surface"
       placeholder="Ex: 15"
+    ></ion-input>
+  </ion-item>
+
+  <ion-item lines="full">
+    <ion-icon name="resize-outline" slot="start"></ion-icon>
+    <ion-label position="stacked"> Description </ion-label>
+    <ion-input
+      type="description"
+      [(ngModel)]="description"
+      placeholder="Ex : Nid de Poule"
     ></ion-input>
   </ion-item>
 

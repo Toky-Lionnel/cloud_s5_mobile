@@ -7,6 +7,8 @@ export interface SignalementData {
   surface: number;
   createdAt: Date;
   idUser: string;
+  description: string;
+  status : number;
 }
 
 @Injectable({

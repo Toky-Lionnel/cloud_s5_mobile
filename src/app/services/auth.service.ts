@@ -25,10 +25,6 @@ export class AuthService {
         createdAt: new Date(),
         pseudo: data.pseudo
       });
-
-      const token = await user.getIdToken();
-      this.sessionService.setUser(user, token);
-      console.log("Inscription réussie !");
     } catch (error) {
       console.error("Erreur d'inscription :", error);
     }

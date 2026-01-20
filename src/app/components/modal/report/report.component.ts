@@ -20,6 +20,7 @@ export class ReportModalComponent {
   @Input() lat!: number;
   @Input() lng!: number;
   surface: number | null = null;
+  description : string | null = null;
 
   constructor(private modalCtrl: ModalController) {
     addIcons({ checkmarkOutline, closeOutline, resizeOutline, locationOutline });
@@ -32,7 +33,8 @@ export class ReportModalComponent {
   confirm() {
     return this.modalCtrl.dismiss({
       location: { lat: this.lat, lng: this.lng },
-      surface: this.surface
+      surface: this.surface,
+      description: this.description,
     }, 'confirm');
   }
 }

@@ -49,13 +49,17 @@ export class ProfilePage implements OnInit {
     });
   }
 
-  ngOnInit() {
+  async ngOnInit() {
+    const loading = await this.loadingCtrl.create({ message: 'Recuperation des infos...' });
+    await loading.present();
+
     const user = this.sessionService.getUser();
     if (user) {
       this.userProfile.email = user.email || '';
       this.newEmail = user.email || '';
-      this.loadFirestoreData(user.uid);
+      await this.loadFirestoreData(user.uid);
     }
+    loading.dismiss();
   }
 
   async loadFirestoreData(uid: string) {

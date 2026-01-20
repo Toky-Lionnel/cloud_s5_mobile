@@ -31,7 +31,7 @@ export class LoginPage {
   }
 
   async login() {
-    // 1. Créer le loader
+    // 1. Créer le loader  
     const loading = await this.loadingCtrl.create({
       message: 'Connexion en cours...',
       spinner: 'crescent'

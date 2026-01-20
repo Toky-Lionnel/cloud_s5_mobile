@@ -6,7 +6,7 @@ import { ReportModalComponent } from 'src/app/components/modal/report/report.com
 import {IonContent,IonFab,IonFabButton,IonIcon,
   IonLabel,LoadingController,ToastController,IonMenuButton, IonButtons, } from '@ionic/angular/standalone';
 import * as L from 'leaflet';
-import { locate, add, search, alertCircle } from 'ionicons/icons';
+import { locate, add, search, alertCircle, person, peopleOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { Geolocation } from '@capacitor/geolocation';
 import { GeoPoint } from 'firebase/firestore';
@@ -36,6 +36,10 @@ export class MapPage implements OnInit, OnDestroy {
   tempMarker: L.Marker | null = null;
   private signalementsSub?: Subscription;
 
+  onlyMyReports: boolean = false;
+  allMarkers: L.LayerGroup = L.layerGroup(); // Pour gérer facilement l'affichage/effacement
+
+
   constructor(
     private modalCtrl: ModalController,
     private signalementService: SignalementService,
@@ -43,7 +47,7 @@ export class MapPage implements OnInit, OnDestroy {
     private toastCtrl: ToastController,
     private sessionService : SessionService,
   ) {
-    addIcons({ locate, add, search, alertCircle });
+    addIcons({ locate, add, search, alertCircle, person, peopleOutline });
   }
 
   ngOnInit() {
@@ -54,6 +58,12 @@ export class MapPage implements OnInit, OnDestroy {
       }, 500);
   }
 
+  toggleFilter() {
+    this.onlyMyReports = !this.onlyMyReports;
+    this.loadSignalements();
+  }
+
+
   initMap() {
     this.map = L.map('map').setView([-18.8792, 47.5079], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -63,6 +73,7 @@ export class MapPage implements OnInit, OnDestroy {
     this.map.on('click', (e: L.LeafletMouseEvent) => {
       this.onMapClick(e);
     });
+    this.allMarkers.addTo(this.map);
   }
 
 
@@ -111,24 +122,41 @@ export class MapPage implements OnInit, OnDestroy {
   }
 
   loadSignalements() {
+    const currentUserId = this.sessionService.getUser().uid;
+
+    if (this.signalementsSub) this.signalementsSub.unsubscribe();
+
     const data$ = this.signalementService.getSignalements() as Observable<any[]>;
 
     this.signalementsSub = data$.subscribe(signalements => {
-      // Optionnel : Nettoyer les anciens cercles si nécessaire avant de redessiner
-      // (sinon ils vont se superposer à chaque mise à jour)
+
+      this.allMarkers.clearLayers();
 
       signalements.forEach(sig => {
+        const isOwner = sig.idUser === currentUserId; // Assurez-vous d'enregistrer userId dans saveSignalement
+
+        if (this.onlyMyReports && !isOwner) return;
+
         if (sig.localisation) {
           const lat = sig.localisation.latitude;
           const lng = sig.localisation.longitude;
 
-          L.circle([lat, lng], {
-            color: 'orange',
-            fillColor: '#f03',
-            fillOpacity: 0.4,
+          const circle = L.circle([lat, lng], {
+            color: isOwner ? '#2dd36f' : 'orange', // Vert si c'est le mien, orange sinon
+            fillColor: isOwner ? '#2dd36f' : '#f03',
+            fillOpacity: 0.5,
             radius: Math.sqrt(sig.surface || 10) * 5
-          }).addTo(this.map)
-            .bindPopup(`<b>Signalement</b><br>Surface: ${sig.surface}m²`);
+          });
+
+          circle.bindPopup(`
+            <div style="text-align: center">
+              <b>${isOwner ? 'Votre signalement' : 'Signalement externe'}</b><br>
+              ${sig.description || 'Pas de description'}<br>
+              Surface: ${sig.surface}m²
+            </div>
+          `);
+
+          this.allMarkers.addLayer(circle);
         }
       });
     });
@@ -146,7 +174,9 @@ export class MapPage implements OnInit, OnDestroy {
         localisation: new GeoPoint(data.location.lat, data.location.lng),
         surface: data.surface,
         createdAt: new Date(),
-        idUser : this.sessionService.getUser().uid
+        idUser : this.sessionService.getUser().uid,
+        description : data.description,
+        status : 1
       });
 
       await loading.dismiss();
