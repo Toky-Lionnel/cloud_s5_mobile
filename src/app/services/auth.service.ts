@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword, EmailAuthProvider, reauthenticateWithCredential, signInWithEmailAndPassword, updateEmail, updatePassword } from '@angular/fire/auth';
-import { Firestore, doc, setDoc } from '@angular/fire/firestore';
+import { Firestore, doc, setDoc, collection, query, where,getDocs, updateDoc } from '@angular/fire/firestore';
 import { SessionService } from './session.service';
+import { Timestamp } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root'
@@ -35,11 +36,50 @@ export class AuthService {
   }
 
   async login(email: string, password: string) {
-    const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
-    const user = userCredential.user;
-    const token = await user.getIdToken();
-    this.sessionService.setUser(user, token);
+
+    const usersRef = collection(this.firestore, 'users');
+    const q = query(usersRef, where('email', '==', email));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      throw new Error('Utilisateur non trouvé.');
+    }
+
+    const userDoc = querySnapshot.docs[0];
+    const userRef = doc(this.firestore, `users/${userDoc.id}`);
+    const userData = userDoc.data() as any;
+
+    if (userData.nbrTentative >= 3) {
+      throw new Error("Compte bloqué après 3 tentatives.");
+    }
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
+      const user = userCredential.user;
+      const token = await user.getIdToken();
+
+      await updateDoc(userRef, {
+        nbrTentative: 0,
+        firebaseUid: user.uid,
+        updatedAt: Timestamp.now()
+      });
+
+      this.sessionService.setUser(user, token);
+    } catch (error: any) {
+      const newCount = (userData.nbrTentative || 0) + 1;
+      await updateDoc(userRef, {
+        nbrTentative: newCount,
+        updatedAt: Timestamp.now()
+      });
+
+      if (newCount >= 3) {
+        throw new Error("Compte bloqué après 3 tentatives.");
+      }
+
+      throw new Error("Email ou mot de passe incorrect.");
+    }
   }
+
 
   logout() {
     this.auth.signOut();

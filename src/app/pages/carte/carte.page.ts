@@ -152,9 +152,14 @@ export class MapPage implements OnInit, OnDestroy {
             <div style="text-align: center">
               <b>${isOwner ? 'Votre signalement' : 'Signalement externe'}</b><br>
               ${sig.description || 'Pas de description'}<br>
-              Surface: ${sig.surface}m²
+              Surface: ${sig.surface ? sig.surface + ' m²' : 'Non spécifiée'}<br>
+              ${sig.status && sig.status !== 1 ? `Statut: ${sig.status}<br>` : ''}
+              ${sig.Entreprise ? `Entreprise: ${sig.Entreprise}<br>` : ''}
+              ${sig.Budget ? `Budget: ${sig.Budget}<br>` : ''}
+              ${sig.createdAt ? `Créé le: ${new Date(sig.createdAt.seconds * 1000).toLocaleString('fr-FR', { timeZone: 'Indian/Antananarivo' })}<br>` : ''}
             </div>
           `);
+
 
           this.allMarkers.addLayer(circle);
         }

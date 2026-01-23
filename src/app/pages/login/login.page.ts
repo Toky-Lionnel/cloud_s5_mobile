@@ -18,8 +18,8 @@ import {
   styleUrls: ['./login.page.scss']
 })
 export class LoginPage {
-  email = 'mobiles5@example.com';
-  password = '123456';
+  email = '';
+  password = '';
 
   constructor(
     private router: Router,
@@ -31,24 +31,24 @@ export class LoginPage {
   }
 
   async login() {
-    // 1. Créer le loader  
     const loading = await this.loadingCtrl.create({
       message: 'Connexion en cours...',
       spinner: 'crescent'
     });
-
     await loading.present();
 
     try {
       await this.authService.login(this.email, this.password);
       await loading.dismiss();
       this.router.navigateByUrl('/map', { replaceUrl: true });
-
     } catch (err: any) {
       await loading.dismiss();
-      this.presentToast('Erreur : Email ou mot de passe incorrect.', 'danger', 'alert-circle-outline');
+
+      const msg = err.message;
+      this.presentToast(`Erreur : ${msg}`, 'danger', 'alert-circle-outline');
     }
   }
+
 
   // Fonction utilitaire pour afficher les messages
   async presentToast(message: string, color: 'success' | 'danger', icon: string) {
