@@ -1,0 +1,43 @@
+.stats-summary {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+.stat-box {
+  flex: 1;
+  background: #f4f5f8;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  .label {
+    display: block;
+    font-size: 0.8rem;
+    color: #666;
+  }
+  .value {
+    font-size: 1.1rem;
+    font-weight: bold;
+  }
+}
+.progress-container {
+  .label-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+}
+.recap-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  th {
+    text-align: left;
+    background: #eee;
+    padding: 10px;
+  }
+  td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #eee;
+  }
+}

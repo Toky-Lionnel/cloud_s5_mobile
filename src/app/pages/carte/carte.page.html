@@ -3,12 +3,14 @@
 <div class="ion-page" id="main-map-content">
 
   <ion-fab slot="fixed" vertical="top" horizontal="end" class="fab-filter">
-    <ion-fab-button [color]="onlyMyReports ? 'success' : 'light'" (click)="toggleFilter()">
+    <ion-fab-button
+      [color]="onlyMyReports ? 'success' : 'light'"
+      (click)="toggleFilter()"
+    >
       <ion-icon [name]="onlyMyReports ? 'person' : 'people-outline'"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 
-  
   <ion-header class="ion-no-border">
     <ion-toolbar>
       <ion-buttons slot="start">
@@ -20,17 +22,21 @@
   <ion-content fullscreen>
     <div id="map"></div>
 
-    <ion-fab slot="fixed" vertical="bottom" horizontal="end" class="fab-locate">
-      <ion-fab-button color="light" (click)="locateUser()">
-        <ion-icon name="locate"></ion-icon>
-      </ion-fab-button>
-    </ion-fab>
+    <div class="footer-actions">
+      <ion-button (click)="openRecap()" color="secondary" shape="round">
+        <ion-icon slot="start" name="list-outline"></ion-icon>
+        Récap
+      </ion-button>
 
-    <ion-fab slot="fixed" vertical="bottom" horizontal="center" class="fab-add">
-      <ion-fab-button color="primary" (click)="addReport()" [disabled]="!selectedLatLng">
-        <ion-icon name="add"></ion-icon>
-        <ion-label>Signaler</ion-label>
-      </ion-fab-button>
-    </ion-fab>
+      <ion-button
+        (click)="addReport()"
+        color="primary"
+        shape="round"
+        [disabled]="!selectedLatLng"
+      >
+        <ion-icon slot="start" name="add"></ion-icon>
+        Signaler
+      </ion-button>
+    </div>
   </ion-content>
 </div>

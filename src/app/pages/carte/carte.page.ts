@@ -1,19 +1,19 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ModalController, IonHeader, IonToolbar } from '@ionic/angular/standalone';
+import { ModalController, IonHeader, IonToolbar, IonButton } from '@ionic/angular/standalone';
 import { ReportModalComponent } from 'src/app/components/modal/report/report.component';
 import {IonContent,IonFab,IonFabButton,IonIcon,
   IonLabel,LoadingController,ToastController,IonMenuButton, IonButtons, } from '@ionic/angular/standalone';
 import * as L from 'leaflet';
 import { locate, add, search, alertCircle, person, peopleOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
-import { Geolocation } from '@capacitor/geolocation';
 import { GeoPoint } from 'firebase/firestore';
 import { SignalementService } from 'src/app/services/signalement.service';
 import { Observable, Subscription } from 'rxjs';
 import { SidebarComponent } from "src/app/components/shared/sidebar/sidebar.component";
 import { SessionService } from 'src/app/services/session.service';
+import { RecapModalComponent } from 'src/app/components/modal/recap/recap.component';
 
 @Component({
   selector: 'app-map',
@@ -24,12 +24,11 @@ import { SessionService } from 'src/app/services/session.service';
     SidebarComponent, IonMenuButton, IonButtons,
     IonContent, IonFab, IonFabButton,
     IonIcon, CommonModule, FormsModule, IonLabel,
-    IonHeader,
-    IonToolbar
-],
+    IonHeader,IonToolbar,IonButton],
 })
 
 export class MapPage implements OnInit, OnDestroy {
+
   map!: L.Map;
   userMarker?: L.Marker;
   selectedLatLng: L.LatLng | null = null;
@@ -37,7 +36,8 @@ export class MapPage implements OnInit, OnDestroy {
   private signalementsSub?: Subscription;
 
   onlyMyReports: boolean = false;
-  allMarkers: L.LayerGroup = L.layerGroup(); // Pour gérer facilement l'affichage/effacement
+  allMarkers: L.LayerGroup = L.layerGroup();
+  allSignalements: any[] = [];
 
 
   constructor(
@@ -50,17 +50,31 @@ export class MapPage implements OnInit, OnDestroy {
     addIcons({ locate, add, search, alertCircle, person, peopleOutline });
   }
 
+
+  async openRecap() {
+    const modal = await this.modalCtrl.create({
+      component: RecapModalComponent,
+      componentProps: {
+        signalements: this.allSignalements
+      },
+      breakpoints: [0, 0.5, 0.9], // S'ouvre à moitié ou presque plein écran
+      initialBreakpoint: 0.5
+    });
+    await modal.present();
+  }
+
+
   ngOnInit() {
     setTimeout(
       () => {
         this.initMap();
-        this.loadSignalements();
+        this.loadSignalementsOnInit();
       }, 500);
   }
 
   toggleFilter() {
     this.onlyMyReports = !this.onlyMyReports;
-    this.loadSignalements();
+    this.displaySignalementsOnMap();
   }
 
 
@@ -96,6 +110,61 @@ export class MapPage implements OnInit, OnDestroy {
   }
 
 
+  loadSignalementsOnInit() {
+    if (this.signalementsSub) {
+      this.signalementsSub.unsubscribe();
+    }
+
+    const data$ = this.signalementService.getSignalements() as Observable<any[]>;
+
+    this.signalementsSub = data$.subscribe({
+      next: (signalements) => {
+        this.allSignalements = signalements;
+        this.displaySignalementsOnMap();
+      },
+      error: (err) => {
+        console.error('Erreur lors du chargement des signalements :', err);
+      }
+    });
+  }
+
+  displaySignalementsOnMap() {
+    const currentUserId = this.sessionService.getUser().uid;
+    this.allMarkers.clearLayers();
+
+    this.allSignalements.forEach(sig => {
+      const isOwner = sig.idUser === currentUserId;
+      if (this.onlyMyReports && !isOwner) return;
+
+      if (sig.localisation) {
+        const lat = sig.localisation.latitude;
+        const lng = sig.localisation.longitude;
+
+        const circle = L.circle([lat, lng], {
+          color: isOwner ? '#2dd36f' : 'orange',
+          fillColor: isOwner ? '#2dd36f' : '#f03',
+          fillOpacity: 0.5,
+          radius: Math.sqrt(sig.surface || 10) * 5
+        });
+
+        circle.bindPopup(`
+          <div style="text-align: center">
+            <b>${isOwner ? 'Votre signalement' : 'Signalement externe'}</b><br>
+            ${sig.description || 'Pas de description'}<br>
+            Surface: ${sig.surface ? sig.surface + ' m²' : 'Non spécifiée'}<br>
+            ${sig.status && sig.status !== 1 ? `Statut: ${sig.status}<br>` : ''}
+            ${sig.Entreprise ? `Entreprise: ${sig.Entreprise}<br>` : ''}
+            ${sig.Budget ? `Budget: ${sig.Budget}<br>` : ''}
+            ${sig.createdAt ? `Créé le: ${new Date(sig.createdAt.seconds * 1000).toLocaleString('fr-FR', { timeZone: 'Indian/Antananarivo' })}<br>` : ''}
+          </div>
+        `);
+
+        this.allMarkers.addLayer(circle);
+      }
+    });
+  }
+
+
   async addReport() {
     if (!this.selectedLatLng) {
       alert("Veuillez d'abord cliquer sur un point de la carte.");
@@ -119,52 +188,6 @@ export class MapPage implements OnInit, OnDestroy {
     if (role === 'confirm') {
       this.saveSignalement(data);
     }
-  }
-
-  loadSignalements() {
-    const currentUserId = this.sessionService.getUser().uid;
-
-    if (this.signalementsSub) this.signalementsSub.unsubscribe();
-
-    const data$ = this.signalementService.getSignalements() as Observable<any[]>;
-
-    this.signalementsSub = data$.subscribe(signalements => {
-
-      this.allMarkers.clearLayers();
-
-      signalements.forEach(sig => {
-        const isOwner = sig.idUser === currentUserId; // Assurez-vous d'enregistrer userId dans saveSignalement
-
-        if (this.onlyMyReports && !isOwner) return;
-
-        if (sig.localisation) {
-          const lat = sig.localisation.latitude;
-          const lng = sig.localisation.longitude;
-
-          const circle = L.circle([lat, lng], {
-            color: isOwner ? '#2dd36f' : 'orange', // Vert si c'est le mien, orange sinon
-            fillColor: isOwner ? '#2dd36f' : '#f03',
-            fillOpacity: 0.5,
-            radius: Math.sqrt(sig.surface || 10) * 5
-          });
-
-          circle.bindPopup(`
-            <div style="text-align: center">
-              <b>${isOwner ? 'Votre signalement' : 'Signalement externe'}</b><br>
-              ${sig.description || 'Pas de description'}<br>
-              Surface: ${sig.surface ? sig.surface + ' m²' : 'Non spécifiée'}<br>
-              ${sig.status && sig.status !== 1 ? `Statut: ${sig.status}<br>` : ''}
-              ${sig.Entreprise ? `Entreprise: ${sig.Entreprise}<br>` : ''}
-              ${sig.Budget ? `Budget: ${sig.Budget}<br>` : ''}
-              ${sig.createdAt ? `Créé le: ${new Date(sig.createdAt.seconds * 1000).toLocaleString('fr-FR', { timeZone: 'Indian/Antananarivo' })}<br>` : ''}
-            </div>
-          `);
-
-
-          this.allMarkers.addLayer(circle);
-        }
-      });
-    });
   }
 
 
@@ -208,26 +231,6 @@ export class MapPage implements OnInit, OnDestroy {
   }
 
 
-  async locateUser() {
-    const coordinates = await Geolocation.getCurrentPosition();
-    const latlng = L.latLng(coordinates.coords.latitude, coordinates.coords.longitude);
-
-    if (this.userMarker) {
-      this.userMarker.setLatLng(latlng);
-    } else {
-      const userIcon = L.divIcon({
-        className: 'user-location-icon',
-        html: '<div class="blue-dot"></div>',
-        iconSize: [20, 20],
-      });
-      this.userMarker = L.marker(latlng, { icon: userIcon }).addTo(this.map);
-    }
-    this.map.setView(latlng, 16);
-  }
-
-
-
-  // Très important : se désabonner pour éviter les fuites de mémoire
   ngOnDestroy() {
     if (this.signalementsSub) {
       this.signalementsSub.unsubscribe();

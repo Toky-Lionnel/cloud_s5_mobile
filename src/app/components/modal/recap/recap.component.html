@@ -1,0 +1,62 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Récapitulation Globale</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()">Fermer</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="stats-summary">
+    <div class="stat-box">
+      <span class="label">Nb points</span>
+      <span class="value">{{ stats.count }}</span>
+    </div>
+    <div class="stat-box">
+      <span class="label">Total Budget</span>
+      <span class="value">{{ stats.budget | number: "1.0-0" }} Ar</span>
+    </div>
+  </div>
+
+  <ion-card>
+    <ion-card-content>
+      <div class="progress-container">
+        <div class="label-row">
+          <span>Avancement Global</span>
+          <span>{{ stats.avancement }}%</span>
+        </div>
+        <ion-progress-bar [value]="stats.avancement / 100"></ion-progress-bar>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <table class="recap-table">
+    <thead>
+      <tr>
+        <th>Indicateur</th>
+        <th>Valeur</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Surface totale</td>
+        <td>
+          <strong>{{ stats.surface | number }} m²</strong>
+        </td>
+      </tr>
+      <tr>
+        <td>Projets terminés</td>
+        <td>
+          <strong>{{ stats.termine }}</strong>
+        </td>
+      </tr>
+      <tr>
+        <td>Projets nouveaux</td>
+        <td>
+          <strong>{{ stats.nouveau }}</strong>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</ion-content>
