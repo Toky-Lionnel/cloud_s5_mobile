@@ -2,14 +2,21 @@
 
 <div class="ion-page" id="main-map-content">
 
-  <ion-fab slot="fixed" vertical="top" horizontal="end" class="fab-filter">
-    <ion-fab-button
-      [color]="onlyMyReports ? 'success' : 'light'"
-      (click)="toggleFilter()"
-    >
-      <ion-icon [name]="onlyMyReports ? 'person' : 'people-outline'"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
+
+  <div class="filter-container">
+    <ion-segment [value]="onlyMyReports ? 'mine' : 'all'" (ionChange)="toggleFilter()" mode="ios">
+      <ion-segment-button value="all">
+        <ion-icon name="people-outline"></ion-icon>
+        <ion-label>Tous</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="mine">
+        <ion-icon name="person-outline"></ion-icon>
+        <ion-label>Moi</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
+
 
   <ion-header class="ion-no-border">
     <ion-toolbar>

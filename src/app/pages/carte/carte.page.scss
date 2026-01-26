@@ -4,24 +4,6 @@
   z-index: 1;
 }
 
-.search-container {
-  position: absolute;
-  top: 20px;
-  left: 10px;
-  right: 10px;
-  z-index: 1000;
-
-  ion-searchbar {
-    --box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    --border-radius: 12px;
-  }
-}
-
-// Positionnement spécifique des boutons
-.fab-locate {
-  margin-bottom: 90px; // Au-dessus du bouton ajouter
-}
-
 .fab-add {
   margin-bottom: 20px;
 
@@ -31,18 +13,6 @@
   }
 }
 
-// Style pour le point bleu de localisation
-::ng-deep .user-location-icon {
-  .blue-dot {
-    width: 15px;
-    height: 15px;
-    background: #3880ff;
-    border: 3px solid white;
-    border-radius: 50%;
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
-    animation: pulse 2s infinite;
-  }
-}
 
 @keyframes pulse {
   0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(56, 128, 255, 0.7); }
@@ -51,9 +21,39 @@
 }
 
 
-.fab-filter {
-  margin-top: 80px; // Pour ne pas chevaucher le bouton menu ou la recherche
-  margin-right: 10px;
+.filter-container {
+  position: absolute;
+  top: 75px; // Sous votre barre de recherche/header
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: 90%;
+  max-width: 250px;
+
+  ion-segment {
+    --background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+
+    ion-segment-button {
+      --color: var(--ion-color-medium);
+      --color-checked: var(--ion-color-primary);
+      --indicator-color: white;
+      min-height: 40px;
+
+      ion-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      ion-icon {
+        font-size: 1.1rem;
+        margin-bottom: 2px;
+      }
+    }
+  }
 }
 
 

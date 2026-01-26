@@ -31,7 +31,7 @@ export class RecapModalComponent implements OnInit {
       this.stats.budget += b;
 
       if (s.status === 'terminé') this.stats.termine++;
-      if (s.status === 'nouveau') this.stats.nouveau++;
+      if (s.idStatus === 1) this.stats.nouveau++;
     });
 
 

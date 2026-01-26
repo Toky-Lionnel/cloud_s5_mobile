@@ -1,12 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ModalController, IonHeader, IonToolbar, IonButton } from '@ionic/angular/standalone';
+import { ModalController, IonHeader, IonToolbar, IonButton, IonSegment, IonSegmentButton } from '@ionic/angular/standalone';
 import { ReportModalComponent } from 'src/app/components/modal/report/report.component';
 import {IonContent,IonFab,IonFabButton,IonIcon,
   IonLabel,LoadingController,ToastController,IonMenuButton, IonButtons, } from '@ionic/angular/standalone';
 import * as L from 'leaflet';
-import { locate, add, search, alertCircle, person, peopleOutline } from 'ionicons/icons';
+import { locate, add, search, alertCircle, person, peopleOutline, personOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { GeoPoint } from 'firebase/firestore';
 import { SignalementService } from 'src/app/services/signalement.service';
@@ -24,7 +24,10 @@ import { RecapModalComponent } from 'src/app/components/modal/recap/recap.compon
     SidebarComponent, IonMenuButton, IonButtons,
     IonContent, IonFab, IonFabButton,
     IonIcon, CommonModule, FormsModule, IonLabel,
-    IonHeader,IonToolbar,IonButton],
+    IonHeader, IonToolbar, IonButton,
+    IonSegment,
+    IonSegmentButton
+],
 })
 
 export class MapPage implements OnInit, OnDestroy {
@@ -47,7 +50,7 @@ export class MapPage implements OnInit, OnDestroy {
     private toastCtrl: ToastController,
     private sessionService : SessionService,
   ) {
-    addIcons({ locate, add, search, alertCircle, person, peopleOutline });
+    addIcons({ locate, add, search, alertCircle, person, peopleOutline, personOutline });
   }
 
 
@@ -204,7 +207,7 @@ export class MapPage implements OnInit, OnDestroy {
         createdAt: new Date(),
         idUser : this.sessionService.getUser().uid,
         description : data.description,
-        status : 1
+        idStatus : 1
       });
 
       await loading.dismiss();
@@ -219,12 +222,16 @@ export class MapPage implements OnInit, OnDestroy {
   async saveSignalement(data: any) {
     await this.sauvegarderSignalement(data);
     L.circle([data.location.lat, data.location.lng], {
-      color: 'orange',
-      fillColor: '#f03',
+      color: '#2dd36f',
+      fillColor: '#2dd36f',
       fillOpacity: 0.5,
       radius: Math.sqrt(data.surface) * 5 // Exemple visuel basé sur la surface
     }).addTo(this.map)
-      .bindPopup(`Signalement: ${data.surface}m²`);
+      .bindPopup(`<div style="text-align: center">
+            <b>Votre nouveau signalement</b><br>
+            ${data.description || 'Pas de description'}<br>
+            Surface: ${data.surface + ' m²'}<br>
+          </div>`);
 
     this.selectedLatLng = null; // Reset
     if (this.tempMarker) this.map.removeLayer(this.tempMarker);
