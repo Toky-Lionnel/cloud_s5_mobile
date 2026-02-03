@@ -180,8 +180,8 @@ export class MapPage implements OnInit, OnDestroy {
         lat: this.selectedLatLng.lat,
         lng: this.selectedLatLng.lng
       },
-      breakpoints: [0, 0.5, 0.8],
-      initialBreakpoint: 0.5
+      initialBreakpoint: 1,
+      breakpoints: [0, 1]
     });
 
     await modal.present();

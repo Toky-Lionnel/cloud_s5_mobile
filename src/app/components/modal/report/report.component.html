@@ -1,8 +1,8 @@
-<ion-header>
+<ion-header class="ion-no-border">
   <ion-toolbar color="primary">
     <ion-buttons slot="start">
       <ion-button (click)="cancel()">
-        <ion-icon name="close-outline"></ion-icon>
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
     <ion-title>Nouveau Signalement</ion-title>
@@ -10,39 +10,59 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-item lines="full" class="ion-margin-bottom">
-    <ion-icon name="location-outline" slot="start"></ion-icon>
-    <ion-label position="stacked">Coordonnées séléctionnées</ion-label>
-    <ion-input [value]="lat + ', ' + lng" readonly></ion-input>
-  </ion-item>
+  <ion-list lines="none">
+    <ion-item class="custom-item">
+      <ion-icon name="location-outline" slot="start" color="primary"></ion-icon>
+      <ion-label position="stacked">Coordonnées</ion-label>
+      <ion-input [value]="lat.toFixed(6) + ', ' + lng.toFixed(6)" readonly></ion-input>
+    </ion-item>
 
-  <ion-item lines="full" class="ion-margin-bottom">
-    <ion-icon name="resize-outline" slot="start"></ion-icon>
-    <ion-label position="stacked">Surface estimée (m²)</ion-label>
-    <ion-input
-      type="number"
-      [(ngModel)]="surface"
-      placeholder="Ex: 15"
-    ></ion-input>
-  </ion-item>
+    <ion-item class="custom-item">
+      <ion-icon name="resize-outline" slot="start" color="primary"></ion-icon>
+      <ion-label position="stacked">Surface estimée (m²)</ion-label>
+      <ion-input type="number" [(ngModel)]="surface" placeholder="Ex: 15"></ion-input>
+    </ion-item>
 
-  <ion-item lines="full">
-    <ion-icon name="resize-outline" slot="start"></ion-icon>
-    <ion-label position="stacked"> Description </ion-label>
-    <ion-input
-      type="description"
-      [(ngModel)]="description"
-      placeholder="Ex : Nid de Poule"
-    ></ion-input>
-  </ion-item>
+    <ion-item class="custom-item">
+      <ion-icon name="document-text-outline" slot="start" color="primary"></ion-icon>
+      <ion-label position="stacked">Description</ion-label>
+      <ion-textarea [(ngModel)]="description" placeholder="Précisez la nature du problème..." rows="3"></ion-textarea>
+    </ion-item>
+  </ion-list>
 
-  <ion-button
-    expand="block"
-    class="ion-margin-top"
-    (click)="confirm()"
-    [disabled]="!surface"
-  >
-    <ion-icon name="checkmark-outline" slot="start"></ion-icon>
-    Confirmer le signalement
-  </ion-button>
+  <div class="photo-section ion-margin-top">
+    <ion-label class="section-title">
+      Photos du problème <ion-badge color="primary">{{ photos.length }}</ion-badge>
+    </ion-label>
+
+    <div class="image-grid">
+      <div class="image-item" *ngFor="let p of photos; let i = index">
+        <img [src]="p" (click)="previewImage(p)" />
+        <ion-button fill="clear" class="btn-remove" (click)="removePhoto(i, $event)">
+          <ion-icon name="close-circle" color="danger"></ion-icon>
+        </ion-button>
+      </div>
+
+      <div class="add-image-btn" (click)="presentImageSourceHelper()">
+        <ion-icon name="camera-outline"></ion-icon>
+        <span>Ajouter</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="full-preview" *ngIf="selectedPreview" (click)="selectedPreview = null">
+    <div class="preview-content">
+      <img [src]="selectedPreview" />
+      <ion-button fill="clear" color="light" class="close-preview">
+        <ion-icon name="close-circle" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+  </div>
 </ion-content>
+
+<ion-footer class="ion-no-border ion-padding">
+  <ion-button expand="block" shape="round" (click)="confirm()" [disabled]="!surface || photos.length === 0">
+    <ion-icon name="checkmark-outline" slot="start"></ion-icon>
+    Envoyer le signalement
+  </ion-button>
+</ion-footer>

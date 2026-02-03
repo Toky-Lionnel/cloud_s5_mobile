@@ -12,7 +12,7 @@ import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    importProvidersFrom(FormsModule), // IMPORTANT
+    importProvidersFrom(FormsModule), 
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular(),
     provideRouter(routes, withPreloading(PreloadAllModules)),

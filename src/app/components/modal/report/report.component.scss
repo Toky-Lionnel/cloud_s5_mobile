@@ -1,0 +1,135 @@
+.custom-item {
+  --padding-start: 0;
+  margin-bottom: 10px;
+  ion-label {
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: var(--ion-color-step-600);
+  }
+}
+
+.photo-section {
+  .section-title {
+    font-weight: bold;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+  }
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+
+  .image-item {
+    position: relative;
+    aspect-ratio: 1;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .btn-remove {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      --padding-start: 0;
+      --padding-end: 0;
+      height: 24px;
+      width: 24px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+  }
+
+  .add-image-btn {
+    aspect-ratio: 1;
+    border: 2px dashed var(--ion-color-medium);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--ion-color-light);
+    color: var(--ion-color-medium);
+
+    ion-icon { font-size: 1.8rem; }
+    span { font-size: 0.75rem; font-weight: bold; margin-top: 4px; }
+
+    &:active {
+      background: var(--ion-color-step-200);
+    }
+  }
+}
+
+ion-footer {
+  background: white;
+  ion-button {
+    height: 52px;
+    font-weight: bold;
+    --box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.3);
+  }
+}
+
+
+// Styles pour la prévisualisation plein écran
+.full-preview {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.3s ease;
+
+  .preview-content {
+    position: relative;
+    width: 95%;
+    max-height: 80%;
+    img {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+    .close-preview {
+      position: absolute;
+      top: -40px;
+      right: 0;
+      font-size: 2rem;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+// Custom items pour un look plus moderne
+.custom-item {
+  --background: #f8f9fa;
+  --border-radius: 12px;
+  margin-bottom: 12px;
+  --padding-start: 12px;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  .image-item img {
+    cursor: pointer;
+    transition: transform 0.2s;
+    &:active { transform: scale(0.95); }
+  }
+}
