@@ -13,26 +13,38 @@
   <ion-list lines="none">
     <ion-item class="custom-item">
       <ion-icon name="location-outline" slot="start" color="primary"></ion-icon>
-      <ion-label position="stacked">Coordonnées</ion-label>
-      <ion-input [value]="lat.toFixed(6) + ', ' + lng.toFixed(6)" readonly></ion-input>
+      <div class="input-wrapper">
+        <ion-label class="custom-label">Coordonnées</ion-label>
+        <ion-input [value]="lat.toFixed(6) + ', ' + lng.toFixed(6)" readonly class="readonly-input"></ion-input>
+      </div>
     </ion-item>
 
     <ion-item class="custom-item">
       <ion-icon name="resize-outline" slot="start" color="primary"></ion-icon>
-      <ion-label position="stacked">Surface estimée (m²)</ion-label>
-      <ion-input type="number" [(ngModel)]="surface" placeholder="Ex: 15"></ion-input>
+      <div class="input-wrapper">
+        <ion-label class="custom-label">Surface estimée (m²)</ion-label>
+        <ion-input type="number" [(ngModel)]="surface" placeholder="Ex: 15"></ion-input>
+      </div>
     </ion-item>
 
-    <ion-item class="custom-item">
+    <ion-item class="custom-item textarea-item">
       <ion-icon name="document-text-outline" slot="start" color="primary"></ion-icon>
-      <ion-label position="stacked">Description</ion-label>
-      <ion-textarea [(ngModel)]="description" placeholder="Précisez la nature du problème..." rows="3"></ion-textarea>
+      <div class="input-wrapper">
+        <ion-label class="custom-label">Description</ion-label>
+        <ion-textarea
+          [(ngModel)]="description"
+          placeholder="Précisez la nature du problème..."
+          
+          rows="3">
+        </ion-textarea>
+      </div>
     </ion-item>
   </ion-list>
 
   <div class="photo-section ion-margin-top">
     <ion-label class="section-title">
-      Photos du problème <ion-badge color="primary">{{ photos.length }}</ion-badge>
+      Photos du problème
+      <ion-badge color="primary">{{ photos.length }}</ion-badge>
     </ion-label>
 
     <div class="image-grid">
@@ -51,9 +63,9 @@
   </div>
 
   <div class="full-preview" *ngIf="selectedPreview" (click)="selectedPreview = null">
-    <div class="preview-content">
+    <div class="preview-content" (click)="$event.stopPropagation()">
       <img [src]="selectedPreview" />
-      <ion-button fill="clear" color="light" class="close-preview">
+      <ion-button fill="clear" color="light" class="close-preview" (click)="selectedPreview = null">
         <ion-icon name="close-circle" slot="icon-only"></ion-icon>
       </ion-button>
     </div>

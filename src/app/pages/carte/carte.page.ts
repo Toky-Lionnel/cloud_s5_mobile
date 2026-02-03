@@ -15,6 +15,7 @@ import { SidebarComponent } from "src/app/components/shared/sidebar/sidebar.comp
 import { SessionService } from 'src/app/services/session.service';
 import { RecapModalComponent } from 'src/app/components/modal/recap/recap.component';
 
+
 @Component({
   selector: 'app-map',
   templateUrl: './carte.page.html',
@@ -48,7 +49,7 @@ export class MapPage implements OnInit, OnDestroy {
     private signalementService: SignalementService,
     private loadingCtrl: LoadingController,
     private toastCtrl: ToastController,
-    private sessionService : SessionService,
+    private sessionService : SessionService
   ) {
     addIcons({ locate, add, search, alertCircle, person, peopleOutline, personOutline });
   }
@@ -151,7 +152,7 @@ export class MapPage implements OnInit, OnDestroy {
         });
 
         circle.bindPopup(`
-          <div style="text-align: center">
+          <div style="text-align: center; max-width: 250px;">
             <b>${isOwner ? 'Votre signalement' : 'Signalement externe'}</b><br>
             ${sig.description || 'Pas de description'}<br>
             Surface: ${sig.surface ? sig.surface + ' m²' : 'Non spécifiée'}<br>
@@ -159,8 +160,29 @@ export class MapPage implements OnInit, OnDestroy {
             ${sig.Entreprise ? `Entreprise: ${sig.Entreprise}<br>` : ''}
             ${sig.Budget ? `Budget: ${sig.Budget}<br>` : ''}
             ${sig.createdAt ? `Créé le: ${new Date(sig.createdAt.seconds * 1000).toLocaleString('fr-FR', { timeZone: 'Indian/Antananarivo' })}<br>` : ''}
+
+            ${
+              sig.images && sig.images.length > 0
+                ? `
+                  <div style="margin-top: 8px;">
+                    ${sig.images
+                      .map(
+                        (img: string) => `
+                        <img
+                          src="${img}"
+                          alt="photo signalement"
+                          style="width: 70px; height: 70px; object-fit: cover; margin: 2px; border-radius: 5px; border: 1px solid #ccc;"
+                        />
+                      `
+                      )
+                      .join('')}
+                  </div>
+                `
+                : '<i>Aucune image</i>'
+            }
           </div>
         `);
+
 
         this.allMarkers.addLayer(circle);
       }
@@ -196,26 +218,34 @@ export class MapPage implements OnInit, OnDestroy {
 
   async sauvegarderSignalement(data: any) {
     const loading = await this.loadingCtrl.create({
-      message: 'Enregistrement du signalement...',
+      message: 'Envoi des photos et du signalement...',
     });
     await loading.present();
 
     try {
-      await this.signalementService.addSignalement({
-        localisation: new GeoPoint(data.location.lat, data.location.lng),
+      const userId = this.sessionService.getUser().uid;
+
+      // 2. Enregistrement Firestore avec les URLs des images
+      await this.signalementService.addSignalementAvecImages({
+        localisation: new GeoPoint(data.lat, data.lng), // vérifiez bien les clés data.lat/lng
         surface: data.surface,
+        description: data.description,
         createdAt: new Date(),
-        idUser : this.sessionService.getUser().uid,
-        description : data.description,
-        idStatus : 1
-      });
+        idUser: userId,
+        idStatus: 1,
+        status: 'nouveau'
+      },data.photos);
 
       await loading.dismiss();
-      this.presentToast('Signalement effectué avec succès !', 'success', 'happy-outline');
-    } catch (error : any) {
+      this.presentToast('Signalement enregistré avec les photos !', 'success', 'happy-outline');
+
+      // Reset de la sélection sur la carte si nécessaire
+      this.selectedLatLng = null;
+
+    } catch (error: any) {
       await loading.dismiss();
-      console.error("Erreur lors de l'enregistrement du signalement:", error);
-      this.presentToast(error.message || `Erreur lors de l'enregistrement du signalement: ${error}`, 'danger', 'close-circle-outline');
+      console.error("Erreur complète:", error);
+      this.presentToast('Erreur lors de l\'envoi. Vérifiez votre connexion.', 'danger', 'close-circle-outline');
     }
   }
 
