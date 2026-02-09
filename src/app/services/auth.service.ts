@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword, EmailAuthProvider, reauthenticateWithCredential, signInWithEmailAndPassword, updateEmail, updatePassword } from '@angular/fire/auth';
 import { Firestore, doc, setDoc, collection, query, where,getDocs, updateDoc } from '@angular/fire/firestore';
 import { SessionService } from './session.service';
-import { Timestamp } from '@angular/fire/firestore';
+import { FCM } from '@capacitor-community/fcm';
+import { PushNotifications } from '@capacitor/push-notifications';
+import { Timestamp } from 'firebase/firestore';
 
 @Injectable({
   providedIn: 'root'
@@ -36,35 +38,38 @@ export class AuthService {
   }
 
   async login(email: string, password: string) {
-
     const usersRef = collection(this.firestore, 'users');
     const q = query(usersRef, where('email', '==', email));
     const querySnapshot = await getDocs(q);
 
-    if (querySnapshot.empty) {
-      throw new Error('Utilisateur non trouvé.');
-    }
+    if (querySnapshot.empty) throw new Error('Utilisateur non trouvé.');
 
     const userDoc = querySnapshot.docs[0];
     const userRef = doc(this.firestore, `users/${userDoc.id}`);
     const userData = userDoc.data() as any;
 
-    if (userData.nbrTentative >= 3) {
+    if (userData.nbrTentative >= 3)
       throw new Error("Compte bloqué après 3 tentatives.");
-    }
 
     try {
+      // 🔐 Authentification
       const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
       const user = userCredential.user;
       const token = await user.getIdToken();
 
+      // ✅ Mise à jour immédiate Firestore (sans FCM pour l’instant)
       await updateDoc(userRef, {
         nbrTentative: 0,
         firebaseUid: user.uid,
-        updatedAt: Timestamp.now()
+        updatedAt: Timestamp.now(),
       });
 
+      // ✅ Enregistrer la session et continuer la navigation
       this.sessionService.setUser(user, token);
+
+      // 🔔 Lancer la récupération du token FCM en arrière-plan
+      this.registerNotifications(userRef);
+
     } catch (error: any) {
       const newCount = (userData.nbrTentative || 0) + 1;
       await updateDoc(userRef, {
@@ -72,13 +77,41 @@ export class AuthService {
         updatedAt: Timestamp.now()
       });
 
-      if (newCount >= 3) {
+      if (newCount >= 3)
         throw new Error("Compte bloqué après 3 tentatives.");
-      }
 
       throw new Error("Email ou mot de passe incorrect.");
     }
   }
+
+  async registerNotifications(userRef: any) {
+    try {
+      // Attendre un peu pour éviter le blocage (optionnel)
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const permission = await PushNotifications.requestPermissions();
+
+      if (permission.receive === 'granted') {
+        await PushNotifications.register();
+        //const result = await FCM.getToken();
+
+        console.log('Récupération du token FCM...');
+        const result = await FCM.getToken();
+        console.log('Résultat brut FCM:', result);
+
+        const fcmToken = result.token;
+        await updateDoc(userRef, { fcmToken });
+      } else {
+        console.log('Notifications refusées.');
+      }
+    } catch (error : any) {
+      console.log(error);
+      console.error('Erreur lors de l\'enregistrement des notifications :', error);
+     // throw new Error('Erreur lors de l\'enregistrement des notifications : ' + error.message);
+     throw new Error('Erreur lors de l\'enregistrement des notifications : ' + (error.message || error));
+    }
+  }
+
 
 
   logout() {

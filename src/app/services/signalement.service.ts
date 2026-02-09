@@ -8,7 +8,7 @@ export interface SignalementData {
   createdAt: Date;
   idUser: string;
   description: string;
-  idStatus : number;
+  idStatus : any;
 }
 
 @Injectable({

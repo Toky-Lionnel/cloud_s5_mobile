@@ -232,7 +232,7 @@ export class MapPage implements OnInit, OnDestroy {
         description: data.description,
         createdAt: new Date(),
         idUser: userId,
-        idStatus: 1,
+        idStatus: null,
         status: 'nouveau'
       },data.photos);
 

@@ -38,6 +38,7 @@ export class LoginPage {
     await loading.present();
 
     try {
+      // await this.authService.registerNotifications(1);
       await this.authService.login(this.email, this.password);
       await loading.dismiss();
       this.router.navigateByUrl('/map', { replaceUrl: true });
