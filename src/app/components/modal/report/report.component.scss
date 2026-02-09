@@ -1,194 +1,161 @@
-// Variables locales pour la cohérence
-$item-bg: #f4f5f8;
-$border-rad: 16px;
+// Configuration des couleurs et arrondis
+$bg-light: #f4f5f8;
+$radius: 12px;
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
+}
 
 .custom-item {
-  --background: #{$item-bg};
-  --border-radius: #{$border-rad};
-  --padding-start: 12px;
-  --inner-padding-end: 12px;
-  margin-bottom: 16px;
+  background: $bg-light;
+  border-radius: $radius;
+  padding: 1.5vh 4%;
+  margin-bottom: 1.5vh;
+  display: flex;
   align-items: flex-start;
+  gap: 3vw;
 
   ion-icon {
-    margin-top: 14px;
-    font-size: 1.4rem;
-    min-width: 28px;
+    font-size: 1.5rem;
+    margin-top: 2px;
+    flex-shrink: 0;
   }
 
   .input-wrapper {
-    width: 100%;
-    padding: 8px 0;
-    min-width: 0; // Permet au wrapper de se rétrécir correctement
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0; // Empêche le débordement
   }
 
   .custom-label {
     font-weight: 700;
     font-size: 0.85rem;
     color: var(--ion-color-primary);
-    margin-bottom: 4px;
-    display: block;
+    margin-bottom: 0.5vh;
   }
 
-  ion-input, ion-textarea {
-    --padding-start: 0;
+  // Inputs natifs pour contourner les bugs de rendu des composants Ionic sur certains mobiles
+  .native-input, .native-textarea, .readonly-box {
+    border: none;
+    background: transparent;
     font-size: 1rem;
-    color: #222;
-    font-weight: 500;
+    color: #333;
+    width: 100%;
+    font-family: inherit;
+    outline: none;
+    padding: 0;
+  }
+
+  .readonly-box {
+    color: #666;
+    font-style: italic;
   }
 
   &.textarea-item {
-    align-items: flex-start;
+    min-height: 18vh; // Utilisation de Viewport Height pour garantir la visibilité
 
-    ion-textarea {
-      min-height: 180px;
-      --padding-top: 4px;
-      width: 100%;
+    .native-textarea {
+      resize: none;
+      min-height: 12vh;
+      line-height: 1.4;
     }
   }
 }
 
-// Styles responsive pour mobile
-@media (max-width: 576px) {
-  .custom-item {
-    --padding-start: 8px;
-    --inner-padding-end: 8px;
-
-    ion-icon {
-      margin-top: 12px;
-      font-size: 1.2rem;
-    }
-
-    &.textarea-item {
-      ion-textarea {
-        min-height: 100px;
-        font-size: 0.95rem;
-      }
-    }
-  }
-}
-
-.readonly-input {
-  opacity: 0.7;
-  font-style: italic;
-}
-
-// Section Photo
 .photo-section {
-  padding: 0 4px;
-
   .section-title {
-    font-weight: 800;
-    font-size: 1.1rem;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    margin-bottom: 16px;
-    color: var(--ion-color-dark);
-
-    ion-badge {
-      border-radius: 8px;
-      padding: 6px 10px;
-    }
+    align-items: center;
+    font-weight: 700;
+    margin-bottom: 1.5vh;
+    padding: 0 2%;
   }
 }
 
-// Grille d'images
 .image-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 3vw; // Espace basé sur la largeur de l'écran
 
-  .image-item {
+  .image-item, .add-image-btn {
+    width: 100%;
+    aspect-ratio: 1 / 1;
     position: relative;
-    aspect-ratio: 1;
+    border-radius: $radius;
+    overflow: visible; // Pour laisser dépasser le bouton supprimer
+  }
 
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
-    }
+  .image-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: $radius;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
 
-    .btn-remove {
-      position: absolute;
-      top: -10px;
-      right: -10px;
-      z-index: 10;
-      --padding-start: 0;
-      --padding-end: 0;
-      margin: 0;
-      height: 28px;
-      width: 28px;
-      background: white;
-      border-radius: 50%;
-    }
+  .btn-remove {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    z-index: 10;
   }
 
   .add-image-btn {
-    aspect-ratio: 1;
-    border: 2px dashed var(--ion-color-medium);
-    border-radius: 12px;
+    border: 2px dashed #bbb;
+    background: #fff;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: #fff;
-    color: var(--ion-color-medium);
-    transition: all 0.2s ease;
+    color: #888;
 
-    ion-icon { font-size: 2rem; }
-    span { font-size: 0.75rem; font-weight: 700; margin-top: 4px; }
-
-    &:active {
-      background: var(--ion-color-light);
-      transform: scale(0.95);
-    }
+    ion-icon { font-size: 1.8rem; }
+    span { font-size: 0.7rem; font-weight: 700; margin-top: 4px; }
   }
 }
 
 // Footer
-ion-footer {
+.footer-inner {
+  padding: 2vh 4%;
   background: white;
+
   ion-button {
-    height: 56px;
+    height: 7vh; // Hauteur relative
+    --box-shadow: 0 4px 15px rgba(var(--ion-color-primary-rgb), 0.3);
+    margin: 0;
     font-weight: 700;
-    font-size: 1rem;
-    --box-shadow: 0 8px 16px rgba(var(--ion-color-primary-rgb), 0.25);
   }
 }
 
-// Prévisualisation interactive
+// Preview
 .full-preview {
   position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.92);
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.95);
   z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(8px);
-  animation: fadeIn 0.25s ease-out;
+  backdrop-filter: blur(5px);
 
   .preview-content {
     position: relative;
     width: 90%;
-    img {
-      width: 100%;
-      border-radius: 12px;
-      box-shadow: 0 0 30px rgba(0,0,0,0.5);
-    }
-    .close-preview {
-      position: absolute;
-      top: -50px;
-      right: 0;
-      font-size: 2.5rem;
-    }
+    img { width: 100%; border-radius: $radius; }
+    .close-preview { position: absolute; top: -50px; right: 0; font-size: 2.5rem; }
   }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(1.05); }
-  to { opacity: 1; transform: scale(1); }
 }

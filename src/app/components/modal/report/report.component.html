@@ -10,54 +10,58 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-list lines="none">
-    <ion-item class="custom-item">
-      <ion-icon name="location-outline" slot="start" color="primary"></ion-icon>
-      <div class="input-wrapper">
-        <ion-label class="custom-label">Coordonnées</ion-label>
-        <ion-input [value]="lat.toFixed(6) + ', ' + lng.toFixed(6)" readonly class="readonly-input"></ion-input>
-      </div>
-    </ion-item>
-
-    <ion-item class="custom-item">
-      <ion-icon name="resize-outline" slot="start" color="primary"></ion-icon>
-      <div class="input-wrapper">
-        <ion-label class="custom-label">Surface estimée (m²)</ion-label>
-        <ion-input type="number" [(ngModel)]="surface" placeholder="Ex: 15"></ion-input>
-      </div>
-    </ion-item>
-
-    <ion-item class="custom-item textarea-item">
-      <ion-icon name="document-text-outline" slot="start" color="primary"></ion-icon>
-      <div class="input-wrapper">
-        <ion-label class="custom-label">Description</ion-label>
-        <ion-textarea
-          [(ngModel)]="description"
-          placeholder="Précisez la nature du problème..."
-          
-          rows="3">
-        </ion-textarea>
-      </div>
-    </ion-item>
-  </ion-list>
-
-  <div class="photo-section ion-margin-top">
-    <ion-label class="section-title">
-      Photos du problème
-      <ion-badge color="primary">{{ photos.length }}</ion-badge>
-    </ion-label>
-
-    <div class="image-grid">
-      <div class="image-item" *ngFor="let p of photos; let i = index">
-        <img [src]="p" (click)="previewImage(p)" />
-        <ion-button fill="clear" class="btn-remove" (click)="removePhoto(i, $event)">
-          <ion-icon name="close-circle" color="danger"></ion-icon>
-        </ion-button>
+  <div class="form-container">
+    <div class="input-group">
+      <div class="custom-item">
+        <ion-icon name="location-outline" color="primary"></ion-icon>
+        <div class="input-wrapper">
+          <label class="custom-label">Coordonnées</label>
+          <div class="readonly-box">
+            {{ lat.toFixed(6) }}, {{ lng.toFixed(6) }}
+          </div>
+        </div>
       </div>
 
-      <div class="add-image-btn" (click)="presentImageSourceHelper()">
-        <ion-icon name="camera-outline"></ion-icon>
-        <span>Ajouter</span>
+      <div class="custom-item">
+        <ion-icon name="resize-outline" color="primary"></ion-icon>
+        <div class="input-wrapper">
+          <label class="custom-label">Surface estimée (m²)</label>
+          <input type="number" [(ngModel)]="surface" placeholder="Ex: 15" class="native-input">
+        </div>
+      </div>
+
+      <div class="custom-item textarea-item">
+        <ion-icon name="document-text-outline" color="primary"></ion-icon>
+        <div class="input-wrapper">
+          <label class="custom-label">Description</label>
+          <textarea
+            [(ngModel)]="description"
+            placeholder="Précisez la nature du problème..."
+            rows="4"
+            class="native-textarea">
+          </textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="photo-section">
+      <div class="section-title">
+        <span>Photos du problème</span>
+        <ion-badge color="primary">{{ photos.length }}</ion-badge>
+      </div>
+
+      <div class="image-grid">
+        <div class="image-item" *ngFor="let p of photos; let i = index">
+          <img [src]="p" (click)="previewImage(p)" />
+          <button class="btn-remove" (click)="removePhoto(i, $event)">
+            <ion-icon name="close-circle" color="danger"></ion-icon>
+          </button>
+        </div>
+
+        <div class="add-image-btn" (click)="presentImageSourceHelper()">
+          <ion-icon name="camera-outline"></ion-icon>
+          <span>Ajouter</span>
+        </div>
       </div>
     </div>
   </div>
@@ -72,9 +76,11 @@
   </div>
 </ion-content>
 
-<ion-footer class="ion-no-border ion-padding">
-  <ion-button expand="block" shape="round" (click)="confirm()" [disabled]="!surface || photos.length === 0">
-    <ion-icon name="checkmark-outline" slot="start"></ion-icon>
-    Envoyer le signalement
-  </ion-button>
+<ion-footer class="ion-no-border">
+  <div class="footer-inner">
+    <ion-button expand="block" shape="round" (click)="confirm()" [disabled]="!surface || photos.length === 0">
+      <ion-icon name="checkmark-outline" slot="start"></ion-icon>
+      Confirmer le signalement
+    </ion-button>
+  </div>
 </ion-footer>
