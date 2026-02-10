@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword, EmailAuthProvider, reauthenticateWithCredential, signInWithEmailAndPassword, updateEmail, updatePassword } from '@angular/fire/auth';
 import { Firestore, doc, setDoc, collection, query, where,getDocs, updateDoc } from '@angular/fire/firestore';
 import { SessionService } from './session.service';
-import { FCM } from '@capacitor-community/fcm';
-import { PushNotifications } from '@capacitor/push-notifications';
 import { Timestamp } from 'firebase/firestore';
+import { PushNotifications, Token, PushNotificationSchema } from '@capacitor/push-notifications';
+
 
 @Injectable({
   providedIn: 'root'
@@ -38,79 +38,101 @@ export class AuthService {
   }
 
   async login(email: string, password: string) {
-    const usersRef = collection(this.firestore, 'users');
-    const q = query(usersRef, where('email', '==', email));
-    const querySnapshot = await getDocs(q);
+  const usersRef = collection(this.firestore, 'users');
+  const q = query(usersRef, where('email', '==', email));
+  const querySnapshot = await getDocs(q);
 
-    if (querySnapshot.empty) throw new Error('Utilisateur non trouvé.');
+  if (querySnapshot.empty) throw new Error('Utilisateur non trouvé.');
 
-    const userDoc = querySnapshot.docs[0];
-    const userRef = doc(this.firestore, `users/${userDoc.id}`);
-    const userData = userDoc.data() as any;
+  const userDoc = querySnapshot.docs[0];
+  const userRef = doc(this.firestore, `users/${userDoc.id}`);
+  const userData = userDoc.data() as any;
 
-    if (userData.nbrTentative >= 3)
+  if (userData.nbrTentative >= 3)
+    throw new Error("Compte bloqué après 3 tentatives.");
+
+  try {
+    // 🔐 Authentification Firebase
+    const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
+    const user = userCredential.user;
+    const token = await user.getIdToken();
+
+    // ✅ Enregistrer le token FCM
+    let fcmToken: string | null = null;
+    try {
+      fcmToken = await this.registerPush(); // Appelle la fonction qui récupère le token
+      if (fcmToken) {
+        console.log('Token FCM récupéré et prêt à être stocké:', fcmToken);
+      }
+    } catch (e) {
+      console.warn('Impossible de récupérer le token FCM:', e);
+    }
+
+    // ✅ Mise à jour Firestore
+    const updateData: any = {
+      nbrTentative: 0,
+      firebaseUid: user.uid,
+      updatedAt: Timestamp.now(),
+    };
+    if (fcmToken) updateData.fcmToken = fcmToken;
+
+    await updateDoc(userRef, updateData);
+
+    // ✅ Enregistrer la session et continuer
+    this.sessionService.setUser(user, token);
+
+  } catch (error: any) {
+    // 🔄 Incrémenter nbrTentative en cas d'erreur login
+    const newCount = (userData.nbrTentative || 0) + 1;
+    await updateDoc(userRef, {
+      nbrTentative: newCount,
+      updatedAt: Timestamp.now()
+    });
+
+    if (newCount >= 3)
       throw new Error("Compte bloqué après 3 tentatives.");
 
-    try {
-      // 🔐 Authentification
-      const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
-      const user = userCredential.user;
-      const token = await user.getIdToken();
-
-      // ✅ Mise à jour immédiate Firestore (sans FCM pour l’instant)
-      await updateDoc(userRef, {
-        nbrTentative: 0,
-        firebaseUid: user.uid,
-        updatedAt: Timestamp.now(),
-      });
-
-      // ✅ Enregistrer la session et continuer la navigation
-      this.sessionService.setUser(user, token);
-
-      // 🔔 Lancer la récupération du token FCM en arrière-plan
-      this.registerNotifications(userRef);
-
-    } catch (error: any) {
-      const newCount = (userData.nbrTentative || 0) + 1;
-      await updateDoc(userRef, {
-        nbrTentative: newCount,
-        updatedAt: Timestamp.now()
-      });
-
-      if (newCount >= 3)
-        throw new Error("Compte bloqué après 3 tentatives.");
-
-      throw new Error("Email ou mot de passe incorrect.");
-    }
+    throw new Error("Email ou mot de passe incorrect.");
   }
+}
 
-  async registerNotifications(userRef: any) {
-    try {
-      // Attendre un peu pour éviter le blocage (optionnel)
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      const permission = await PushNotifications.requestPermissions();
-
-      if (permission.receive === 'granted') {
-        await PushNotifications.register();
-        //const result = await FCM.getToken();
-
-        console.log('Récupération du token FCM...');
-        const result = await FCM.getToken();
-        console.log('Résultat brut FCM:', result);
-
-        const fcmToken = result.token;
-        await updateDoc(userRef, { fcmToken });
-      } else {
-        console.log('Notifications refusées.');
-      }
-    } catch (error : any) {
-      console.log(error);
-      console.error('Erreur lors de l\'enregistrement des notifications :', error);
-     // throw new Error('Erreur lors de l\'enregistrement des notifications : ' + error.message);
-     throw new Error('Erreur lors de l\'enregistrement des notifications : ' + (error.message || error));
+async registerPush(): Promise<string | null> {
+  try {
+    // Permissions push
+    const permResult: any = await PushNotifications.requestPermissions();
+    const granted = permResult?.receive === 'granted' || permResult?.granted === true;
+    if (!granted) {
+      console.warn('Permissions de notifications non accordées');
+      return null;
     }
+
+    // Listeners
+    PushNotifications.addListener('registrationError', (err) => console.error('Registration error:', err));
+    PushNotifications.addListener('pushNotificationReceived', (notif) => console.log('Push reçue:', notif));
+    PushNotifications.addListener('pushNotificationActionPerformed', (action) => console.log('Push action:', action));
+
+    let tokenValue: string | null = null;
+
+    PushNotifications.addListener('registration', (token: any) => {
+      console.log('Token FCM reçu via listener:', token.value);
+      tokenValue = token.value;
+      // Ici tu peux stocker token.value dans Firestore
+    });
+
+    // Register pour notifications
+    await PushNotifications.register();
+
+    return tokenValue;
+
+  } catch (error) {
+    console.error('Erreur lors de l\'enregistrement push:', error);
+    return null;
   }
+}
+
+
+
+
 
 
 
@@ -149,4 +171,6 @@ async changeEmail(currentEmail: string, currentPassword: string, newEmail: strin
     const token = await user.getIdToken(true);
     this.sessionService.setUser(user, token);
   }
+
+
 }

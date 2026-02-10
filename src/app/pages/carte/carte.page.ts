@@ -49,7 +49,7 @@ export class MapPage implements OnInit, OnDestroy {
     private signalementService: SignalementService,
     private loadingCtrl: LoadingController,
     private toastCtrl: ToastController,
-    private sessionService : SessionService
+    private sessionService : SessionService,
   ) {
     addIcons({ locate, add, search, alertCircle, person, peopleOutline, personOutline });
   }
@@ -287,6 +287,8 @@ export class MapPage implements OnInit, OnDestroy {
     });
     await toast.present();
   }
+
+
 
 
 }

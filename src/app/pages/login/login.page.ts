@@ -18,8 +18,8 @@ import {
   styleUrls: ['./login.page.scss']
 })
 export class LoginPage {
-  email = '';
-  password = '';
+  email = 'manager@gmail.com';
+  password = 'manager';
 
   constructor(
     private router: Router,
