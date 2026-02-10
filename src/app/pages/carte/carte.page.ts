@@ -68,13 +68,46 @@ export class MapPage implements OnInit, OnDestroy {
   }
 
 
-  ngOnInit() {
-    setTimeout(
-      () => {
-        this.initMap();
-        this.loadSignalementsOnInit();
-      }, 500);
+  async ngOnInit() {
+    const loading = await this.loadingCtrl.create({
+      message: 'Chargement des signalements...',
+    });
+    await loading.present();
+
+    this.initMap();
+
+    // on charge les données
+    this.loadSignalementsOnInit(loading);
   }
+
+  loadSignalementsOnInit(loading?: HTMLIonLoadingElement) {
+    if (this.signalementsSub) {
+      this.signalementsSub.unsubscribe();
+    }
+
+    const data$ = this.signalementService.getSignalements() as Observable<any[]>;
+
+    this.signalementsSub = data$.subscribe({
+      next: async (signalements) => {
+        this.allSignalements = signalements;
+        this.displaySignalementsOnMap();
+
+        // fermer le loading après réception
+        if (loading) {
+          await loading.dismiss();
+        }
+      },
+      error: async (err) => {
+        console.error('Erreur lors du chargement des signalements :', err);
+        if (loading) {
+          await loading.dismiss();
+        }
+        this.presentToast('Erreur de chargement des signalements', 'danger', 'alert-circle-outline');
+      }
+    });
+  }
+
+
 
   toggleFilter() {
     this.onlyMyReports = !this.onlyMyReports;
@@ -114,23 +147,7 @@ export class MapPage implements OnInit, OnDestroy {
   }
 
 
-  loadSignalementsOnInit() {
-    if (this.signalementsSub) {
-      this.signalementsSub.unsubscribe();
-    }
 
-    const data$ = this.signalementService.getSignalements() as Observable<any[]>;
-
-    this.signalementsSub = data$.subscribe({
-      next: (signalements) => {
-        this.allSignalements = signalements;
-        this.displaySignalementsOnMap();
-      },
-      error: (err) => {
-        console.error('Erreur lors du chargement des signalements :', err);
-      }
-    });
-  }
 
   displaySignalementsOnMap() {
     const currentUserId = this.sessionService.getUser().uid;
